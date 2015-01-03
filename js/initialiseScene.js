@@ -185,3 +185,6 @@ function addLayers(){
 		}); // concat jslayer
 	}); // foreach function jslayer
 }
+function degInRad(deg) {
+    return deg * Math.PI / 180;
+}
