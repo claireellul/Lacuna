@@ -1,0 +1,72 @@
+// get the basic values to adjust for the fact that we're not full screen
+					var leftoffset = document.getElementById('container').style.left;
+					var top = document.getElementById('container').style.top;
+					var width = document.getElementById('container').clientWidth;
+					var height = document.getElementById('container').clientHeight;
+
+/*
+					var vector = new THREE.Vector3();
+					vector.set(
+					    ( event.clientX-leftoffset / width ) * 2 - 1,
+					    - ( event.clientY / height ) * 2 + 1,
+					    0.5 );
+					console.log("click1 : "+vector.x + " "+vector.y + " "+vector.z);
+					vector.unproject( camera );
+					console.log("click2 : "+vector.x + " "+vector.y + " "+vector.z);
+					var dir = vector.sub( camera.position ).normalize();
+					var distance = - camera.position.z / dir.z;
+					var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+					console.log("click1 : "+pos.x + " "+pos.y + " "+pos.z);
+*/
+
+// for a perspective camera use this option
+// see here for the explanation: http://barkofthebyte.azurewebsites.net/post/2014/05/05/three-js-projecting-mouse-clicks-to-a-3d-scene-how-to-do-it-and-how-it-works
+// basically we first translate the click coords into values to a range of -1 to 0 (middle) to +1 for x (left to right)
+// and the y values to a range of -1 (bottom) to 0 (middle) to + 1 (top)
+// i.e. 0,0 is now at the middle of the screen, and +x and +y correspond to the threejs versions not the screen coords
+var mousex = ( event.clientX-leftoffset / width ) * 2 - 1;
+var mousey = - ( event.clientY-top / height ) * 2 + 1;
+
+// the 0.5 for z is the distance of the point away from the CAMERA
+var vector = new THREE.Vector3(mousex, mousey, 0.5);
+vector.unproject(camera);
+var pos = camera.position;
+var raycaster = new THREE.Raycaster(pos, vector.unproject(camera).sub(camera.position).normalize());
+raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+console.log("objects"+scene.children.length);
+var intersects = raycaster.intersectObjects(sceneobjects,true);
+
+				for ( var i in intersects ) {
+					console.log("intersection"+intersects[i]);
+					try {
+						intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+					} catch ( e){
+						}
+
+				}
+
+// for an orthographic camear use this option
+/*var raycaster = new THREE.Raycaster();
+var dir = new THREE.Vector3();
+dir.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+raycaster.set( vector, dir );
+var intersects = raycaster.intersectObjects( scene.children,true);
+*/
+
+//  if ( intersects.length > 0 ) {
+//        intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+//    }
+
+//					width = window.width;
+//					vector.set(
+//					    ( event.clientX / width ) * 2 - 1,
+//					    - ( event.clientY / height ) * 2 + 1,
+//    0.5 );
+//					console.log("click1 : "+vector.x + " "+vector.y + " "+vector.z);
+//					var vector2 = vector.unproject(camera);
+//					console.log("click unprojected: "+vector2.x + " "+vector2.y + " "+vector2.z);
+//					console.log("camera: "+camera.position.x + " "+camera.position.y + " "+camera.position.z);
+//					var dir = vector2.sub( camera.position ).normalize();
+//					var distance = - camera.position.z / dir.z;
+//					var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+//					console.log("camera: "+pos.x + " "+pos.y + " "+pos.z);

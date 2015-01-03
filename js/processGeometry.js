@@ -247,6 +247,7 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 
 				// Add group to scene
 				scene.add(polyhedralzGroup);
+				sceneobjects.push(polyhedralzGroup);
 				id += 1
 			});
 
@@ -518,6 +519,7 @@ function loadPolygonData(aLayer,layerColour,layername){
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + " " + ids[id].toString();
 						//console.log(modelMesh.name);
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 					}
 					catch(err) {
 						console.log(err)
@@ -570,6 +572,7 @@ if (faces != null) {
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + "_trinagles"  // temporary name + ids[id].toString();
 						console.log(modelMesh.name);
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 /*						scene.children.forEach( function(childLayer) {
 							if (childLayer.name != undefined || childLayer.name === "") {
 								if (childLayer.name.lastIndexOf('test', 0) === 0) {
@@ -615,6 +618,7 @@ function loadBulkTriangles (aLayer, layerColour,layername){
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + "bulktriangles";  //+ ids[id].toString();
 					//	modelMesh.name = 'test';
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 /*						scene.children.forEach( function(childLayer) {
 							if (childLayer.name != undefined || childLayer.name === "") {
 								if (childLayer.name.lastIndexOf('test', 0) === 0) {

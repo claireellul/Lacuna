@@ -1,5 +1,6 @@
 
 // Declare constants
+var sceneobjects = []; // stores all the objects in a scene
 var camera, scene, renderer, controls;
 var helper;
 var intersectedPoint = ""

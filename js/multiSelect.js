@@ -7,13 +7,18 @@ function make_multi_selection() {
 			isHelper = ((o.hasOwnProperty('name')) && (o.name === "Helper"));
 			console.log(o.type+ " "+isMesh + " " +isObject3D + " "+isLine + " "+isAxis + " " +isHelper);
 			oGeom = o.geometry;
+			var minx= 99999999; var miny= 99999999; var maxx = 0; var maxy = 0;
 //			console.log("00000000000000000000000000 " + oGeom.vertices[0].x);
 			if ((isMesh || isLine) && ((isHelper === false) && (isAxis === false))) {
 					// go through vertex by vertex
 					for (i = 0; i < oGeom.vertices.length; i++) {
 						v = o.geometry.vertices[i]
 						console.log(v);
-						vector = new THREE.Vector3( v[0], v[1],0)
+						vector = new THREE.Vector3( v.x, v.y,0)
+						if (minx > v.x) {minx = v.x;}
+						if (miny > v.y) {miny = v.y;}
+						if (maxy < v.y) {maxy = v.y;}
+						if (maxx < v.x) {maxx = v.x;}
 						if ((is_inside_marquee(vector)) && (SELECTED.sceneobject.indexOf(o) === -1 )) {
 							// add to the highlighed objects
 									SELECTED.sceneobject.push(o);
@@ -24,7 +29,9 @@ function make_multi_selection() {
 									}
 						}
 					}
+					console.log(minx + "  "+ miny + "  "+maxx + " " +maxy);
 			}
+
 
 		});
 }

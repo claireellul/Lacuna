@@ -18,18 +18,97 @@
 
 function setupEvents(){
 
-				$('#container').click( function() {
+				$('#container').click( function(event) {
 					console.log("container click");
+			/*		var width = document.getElementById('container').clientWidth;
+					var height = document.getElementById('container').clientHeight;
+
+					var vector = new THREE.Vector3(event.clientX, event.clientY,0);
+					var canvasMouseX = event.clientX - document.getElementById('container').style.left;
+					var canvasMouseY = event.clientY - document.getElementById('container').style.top;
+					//vector.set((canvasMouseX / width) * 2 - 1, -(canvasMouseY / height) * 2 + 1, 0.5);
+					vector.set(canvasMouseX, canvasMouseY, 0);
+					console.log("click1 : "+vector.x + " "+vector.y + " "+vector.z);
+
+					*/
+
+				var vector = new THREE.Vector3();
+
+				// offset doesn't work as the div width is set to be 75%
+				// so offset = 25%
+				var offset = window.innerWidth * 0.25;
+				//var width = document.getElementById('container').clientHeight;
+				var width=window.innerWidth * 0.75;
+				var top = document.getElementById('container').style.top;
+				var height = document.getElementById('container').offsetHeight;
+				console.log ("width "+width + " height " + height + " offset " + offset + " top " + top);
+				//
+				top = document.getElementById('topbar').offsetHeight;
+
+				// this bit of the code takes the mouse click values and puts them in a -1 0 1 framework that
+				// aligns to the three.js axes
+
+				document.getElementById("container").style.border = "thick solid #FF00FF";
+				document.getElementById("container").style.border.visible = true;
+				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
+				console.log(((event.clientX - offset) /width) * 2 - 1);
+				console.log(-((event.clientY - top)/height) * 2 + 1);
+
+				// then unproject the vector to transform it to world coordinates
+				vector2 = vector.unproject( camera );
+				console.log("unprojected vector " + vector2.x +" " + vector2.y + " "+vector2.z);
+				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
+				// subtract the mouse vector from the camera vector
+				// create a unit vector using 'normalise'
+				// create a ray using the camera and this unit vector
+				vector3 = vector2.sub( camera.position ).normalize();
+				console.log("unprojected vector " + vector3.x +" " + vector3.y + " "+vector3.z);
+				//raycaster.ray.set( camera.position, vector2.sub( camera.position ).normalize() );
+				tempvector = new THREE.Vector3(CENTROID[0],CENTROID[1],0);
+				vector3 = tempvector.sub(camera.position).normalise();
+				raycaster.ray.set( camera.position, vector3);
+				//drawRayLine(raycaster,width);
+				var intersects = raycaster.intersectObjects( sceneobjects,true );
+
+				if ( intersects.length > 0 ) {
+					console.log("itersect abc");
+					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+					var particle = new THREE.Sprite( particleMaterial );
+					particle.position.copy( intersects[ 0 ].point );
+					particle.scale.x = particle.scale.y = 16;
+					scene.add( particle );
+				} else {
+					/*				var PI2 = Math.PI * 2;
+
+					    particleMaterial = new THREE.SpriteCanvasMaterial( {
+
+					        color: 0xff0000,
+					        program: function ( context ) {
+
+					            context.beginPath();
+					            context.arc( 0, 0, 0.5, 0, PI2, true );
+					            context.fill();
+
+					        }
+
+					    } );
+
+					var particle = new THREE.Sprite( particleMaterial );
+					particle.position.copy( vector.unproject(camera));
+					particle.scale.x = particle.scale.y = 16;
+					scene.add( particle );
+		*/
+		}
 					//processClick();
 				});
 				$('#container').mouseup( function(event) {
-					console.log("container click");
+					//console.log("container click");
 						if ((overMap === true ) && (MULTISELECT === false) && (SELECT ===false)) {
 							controls.mouseup(event);
 						}
 				});
 				$('#container').mousedown( function(event) {
-					console.log("container click");
+					//console.log("container click");
 						if ((overMap === true ) && (MULTISELECT === false) && (SELECT ===false)) {
 							controls.mousedown(event);
 						}
@@ -45,8 +124,8 @@ function setupEvents(){
 
 
 				$("#container").mousemove(function(event){
-					console.log("container mousemoved");
-					console.log("mousemove "+SELECT + " " + MULTISELECT + " "+select);
+					//console.log("container mousemoved");
+					//console.log("mousemove "+SELECT + " " + MULTISELECT + " "+select);
 					// dont use the move 'look around' as there is no way to stop the movement
 					if ((keyIsPressed === true) && ((MULTISELECT === true) && (SELECT === false)) ) {
 						if ((keyPressedCoords.x === 0) && (keyPressedCoords.y === 0)) {
@@ -83,9 +162,9 @@ function setupEvents(){
 					}
 					// this is a zoom or pan event
 					else {
-						console.log("AAAAAAAAAAAAAAAAAA");
+						//console.log("AAAAAAAAAAAAAAAAAA");
 						if ((overMap === true ) && (MULTISELECT === false) && (SELECT ===false)) {
-							console.log("BBBBBBBBBBBBBBB");
+						//	console.log("BBBBBBBBBBBBBBB");
 							controls.mousemove(event);
 						}
 				}

@@ -15,6 +15,8 @@
 		<script src="js/TrackballControlsModified.js"></script>
 		<script src="js/FlyControlsModified.js"></script>
 		<script src="js/FirstPersonControlsModified.js"></script>
+		<script src="js/Projector.js"></script>
+		<script src="js/CanvasRenderer.js"></script>
 		<script src="js/stats.min.js"></script>
 		<script src="js/jquery-1.11.0.min.js"></script> <!-- jQuery must be defined first! -->
 		<script src="js/jquery-ui.js"></script>

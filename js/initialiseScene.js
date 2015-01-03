@@ -48,8 +48,12 @@ function init() {
 
 
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 1000 );
-	renderer = new THREE.WebGLRenderer({ antialias: true });
+
+	//camera =  new THREE.OrthographicCamera( canvasWidth / - 2, canvasWidth / 2, canvasHeight / 2, canvasHeight / - 2, 1, 1000 );
+	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	//renderer = new THREE.WebGLRenderer({ antialias: true });
+					renderer = new THREE.CanvasRenderer();
+
 	renderer.setSize( canvasWidth, canvasHeight );
 	container.appendChild( renderer.domElement );
 
@@ -75,7 +79,7 @@ function init() {
 
 	camera.position.x = CENTROID[0];
 	camera.position.y = CENTROID[1];
-	camera.position.z = 10;
+	camera.position.z = 500;
 
 
 	// +ve z = out of the screen towards observer's eye
@@ -83,6 +87,22 @@ function init() {
 	// +y =up the screen
 	// red is x
 	// green is y
+
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+					object.position.x =  CENTROID[0];
+					object.position.y =  CENTROID[1];
+					object.position.z = 0;
+
+					object.scale.x =  20 + 1;
+					object.scale.y = 20 + 1;
+					object.scale.z = 5 + 1;
+
+
+					scene.add( object );
+					sceneobjects.push( object );
+
+
 
 	axes = new THREE.AxisHelper(400);
 	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
