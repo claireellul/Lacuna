@@ -18,9 +18,11 @@
 		<script src="js/threev69.js"></script>
 		<script src="js/Projector.js"></script>
 		<script src="js/CanvasRenderer.js"></script>
+		<script src="js/TrackballControlsModified.js"></script>
 		<script src="js/stats.min.js"></script>
 
 		<script>
+			var controls;
 			var centroid0 = 5000; var centroid1 = 5000;
 			var radius = 600;
 			var theta = 0;
@@ -102,6 +104,22 @@
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( width, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+	controls.enabled = true;
+	controls.rotateSpeed = 0.6;
+	controls.zoomSpeed = 1.0;
+	controls.panSpeed = 1.0;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.minDistance = 50;
+	controls.maxDistance = 8000;
+	controls.keys = [ 65, 83, 68 ];
+	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
+	controls.addEventListener( 'change', render );
+
 				var geometry = new THREE.BoxGeometry( 400, 400, 400 );
 					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
 					object.position.x =  centroid0;
@@ -181,7 +199,7 @@ function getFactorPos( val, factor, step )
 }
 function drawRayLine(rayCaster,width)
 {
-	console.log("draw line");
+	//console.log("draw line");
     var scale = width*2;
     var rayDir = new THREE.Vector3(rayCaster.ray.direction.x*scale,rayCaster.ray.direction.y*scale,rayCaster.ray.direction.z*scale);
     var rayVector = new THREE.Vector3(camera.position.x + rayDir.x, camera.position.y + rayDir.y, camera.position.z + rayDir.z);
@@ -195,8 +213,7 @@ function drawRayLine(rayCaster,width)
 				event.preventDefault();
 
 				var vector = new THREE.Vector3();
-
-				console.log(width);
+/*				console.log(width);
 				width = window.innerWidth - 300;
 				console.log("event x" +event.clientX);
 				console.log("event x - 300" +(event.clientX-300));
@@ -223,7 +240,30 @@ function drawRayLine(rayCaster,width)
 				 //drawRayLine(raycaster,width);
 				 render();
 				  //requestAnimationFrame( animate );
+				console.log(objects[0].geometry);
+				var intersects = raycaster.intersectObjects( objects );
+*/
 
+				var vector = new THREE.Vector3();
+				var offset = 300;
+				width = window.innerWidth - 300;
+				var top = document.getElementById('container').style.top;
+				var height = document.getElementById('container').offsetHeight;
+				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
+				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
+				console.log("partial value X" +(event.clientX-offset)/width);
+				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
+				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
+				vector.unproject( camera );
+				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
+				// subtract the mouse vector from the camera vector
+				// create a unit vector using 'normalise'
+				// create a ray using the camera and this unit vector
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				 //drawRayLine(raycaster,width);
+				 render();
+				  //requestAnimationFrame( animate );
+				console.log(objects[0].geometry);
 				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
@@ -284,9 +324,9 @@ function drawLine(pointA, pointB, lineColor)
     var material = new THREE.LineBasicMaterial({
             color: lineColor
     });
-	console.log(pointA.x+" "+pointB.x);
-	console.log(pointA.y+" "+pointB.y);
-	console.log(pointA.z+" "+pointB.z);
+//	console.log(pointA.x+" "+pointB.x);
+//	console.log(pointA.y+" "+pointB.y);
+//	console.log(pointA.z+" "+pointB.z);
     var geometry = new THREE.Geometry();
     var max = 500*500;
     if( Math.abs(pointA.x - pointB.x) < max && Math.abs(pointA.y - pointB.y) < max && Math.abs(pointA.z - pointB.z) < max )

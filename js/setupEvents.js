@@ -32,7 +32,7 @@ function setupEvents(){
 
 					*/
 
-				var vector = new THREE.Vector3();
+/*				var vector = new THREE.Vector3();
 
 				// offset doesn't work as the div width is set to be 75%
 				// so offset = 25%
@@ -63,15 +63,54 @@ function setupEvents(){
 				// create a ray using the camera and this unit vector
 				vector3 = vector2.sub( camera.position ).normalize();
 				console.log("unprojected vector " + vector3.x +" " + vector3.y + " "+vector3.z);
-				//raycaster.ray.set( camera.position, vector2.sub( camera.position ).normalize() );
-				tempvector = new THREE.Vector3(CENTROID[0],CENTROID[1],0);
-				vector3 = tempvector.sub(camera.position).normalise();
-				raycaster.ray.set( camera.position, vector3);
+				raycaster.ray.set( camera.position, vector2.sub( camera.position ).normalize() );
+				//tempvector = new THREE.Vector3(CENTROID[0],CENTROID[1],0);
+				//vector3 = tempvector.sub(camera.position).normalise();
+				//raycaster.ray.set( camera.position, vector3);
 				//drawRayLine(raycaster,width);
+				console.log(sceneobjects[0].geometry)
 				var intersects = raycaster.intersectObjects( sceneobjects,true );
+*/
+				var vector = new THREE.Vector3();
+				var offset = window.innerWidth * 0.25;
+				var width=window.innerWidth * 0.75;
+				var top = document.getElementById('container').style.top;
+				var height = document.getElementById('container').offsetHeight;
+				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
+				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
+				console.log("partial value X" +(event.clientX-offset)/width);
+				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
+				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
+				vector.unproject( camera );
+				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
+
+				// subtract the mouse vector from the camera vector
+				// create a unit vector using 'normalise'
+				// create a ray using the camera and this unit vector
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				 //drawRayLine(raycaster,width);
+				 render();
+				  //requestAnimationFrame( animate );
+				console.log(sceneobjects[0].geometry);
+				var intersects = raycaster.intersectObjects( sceneobjects );
+
 
 				if ( intersects.length > 0 ) {
 					console.log("itersect abc");
+var PI2 = Math.PI * 2;
+var    particleMaterial = new THREE.SpriteCanvasMaterial( {
+
+					        color: 0xff0000,
+					        program: function ( context ) {
+
+					            context.beginPath();
+					            context.arc( 0, 0, 0.5, 0, PI2, true );
+					            context.fill();
+
+					        }
+
+					    } );
+
 					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 					var particle = new THREE.Sprite( particleMaterial );
 					particle.position.copy( intersects[ 0 ].point );

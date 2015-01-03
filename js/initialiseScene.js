@@ -10,6 +10,8 @@ function init() {
 	canvaswidth = $( "#container" ).width()
 	console.log("Canvas Width: ", canvaswidth)
 	console.log("Canvas Height: ", canvasheight)
+	CENTROID[0] = 5000;
+	CENTROID[1] = 5000;
 
 	// Load Stats
 	stats = new Stats();
@@ -74,10 +76,14 @@ function init() {
 	controls.minDistance = 50;
 	controls.maxDistance = 8000;
 	controls.keys = [ 65, 83, 68 ];
-	controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
+	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
 	controls.addEventListener( 'change', render );
 
-	camera.position.x = CENTROID[0];
+
+
+				//camera.position.set(centroid0-300, centroid1, 500 );
+
+	camera.position.x = CENTROID[0]-300;
 	camera.position.y = CENTROID[1];
 	camera.position.z = 500;
 
@@ -89,14 +95,15 @@ function init() {
 	// green is y
 
 
+				var geometry = new THREE.BoxGeometry( 400, 400, 400 );
 					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
 					object.position.x =  CENTROID[0];
 					object.position.y =  CENTROID[1];
 					object.position.z = 0;
 
-					object.scale.x =  20 + 1;
-					object.scale.y = 20 + 1;
-					object.scale.z = 5 + 1;
+				//	object.scale.x =  200 + 1;
+				//	object.scale.y = 200 + 1;
+				//	object.scale.z = 50 + 1;
 
 
 					scene.add( object );
@@ -113,7 +120,7 @@ function init() {
 	console.log("Helper Axes Position : " , axes.position);
 
 	addAxesText(axes);
-	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
+	raycaster = new THREE.Raycaster(); // new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
 
 	//render = function () { requestAnimationFrame( render );
 	//renderer.render(scene, camera);};

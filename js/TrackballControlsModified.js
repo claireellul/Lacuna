@@ -43,7 +43,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// internals
 
-	this.target = new THREE.Vector3();
+	// possible bug here - not taking target from the camera?
+	//	this.target = new THREE.Vector3();
+	this.target = camera.position;
 
 	var EPS = 0.000001;
 
