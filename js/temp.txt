@@ -1,0 +1,102 @@
+	// Create Renderer, set antialiasing (smoother graphically, worse performance)
+	renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize( canvaswidth, canvasheight );
+	renderer.setClearColor( '#262626', 1 ) // SETS BACKGROUND COLOR
+	container.appendChild( renderer.domElement );
+
+	//Scene
+	scene = new THREE.Scene();
+
+	//Centroid
+	console.log("Max X: ", LAYEREXTENTS[0], "Max Y: ", LAYEREXTENTS[1], "Min X: ", LAYEREXTENTS[2], "Min Y: ", LAYEREXTENTS[3]) ;
+	console.log("Centroid: ", CENTROID[0], CENTROID[1]);
+
+	//var baseGeometry = new THREE.PlaneGeometry( maxxextent - minxextent, maxyextent - minyextent );
+	//baseGeometry.applyMatrix( new THREE.Matrix4().makeTranslation(centroid[0], centroid[1], 0) );
+	//var baseMesh = new THREE.Mesh(baseGeometry, new THREE.MeshLambertMaterial({ color: 0x262626, reflectivity: 0, wireframe: false }));
+	//baseMesh.name = "0 Height"
+
+	//Camera
+
+	camera = new THREE.PerspectiveCamera(70, canvaswidth / canvasheight , 1, 4000 );
+	//camera.position = new THREE.Vector3(CENTROID[0], CENTROID[1], 20);
+	var yOffset = (LAYEREXTENTS[1] - LAYEREXTENTS[3]);
+camera.position.z = 100;
+//	camera.position = new THREE.Vector3(CENTROID[0],LAYEREXTENTS[3]-yOffset,20);
+	// rotate the camera to take account of the fact that three.js axies have
+	// +z out of screen, +y up and +x left to right
+	// we need +y back into screen, + z up
+
+	// Axis Helper -- red = X - green = Y  - blue = Z
+	axes = new THREE.AxisHelper(400);
+	scene.add( axes );
+	console.log(CENTROID[0], CENTROID[1])
+//	axes.position.x = CENTROID[0]
+//	axes.position.y = CENTROID[1]
+	//axes.position = new THREE.Vector3(CENTROID[0], CENTROID[1], 0);
+	console.log("Helper Axes Position : " , axes.position);
+
+
+	//Controls
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+	controls.rotateSpeed = 0.6;
+	controls.zoomSpeed = 1.0;
+	controls.panSpeed = 1.0;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.minDistance = 50;
+	controls.maxDistance = 8000;
+	controls.keys = [ 65, 83, 68 ];
+	controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
+//	controls.addEventListener( 'change', render );
+
+
+	// pointer lock interaction
+//	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
+//	controls2 = new THREE.ArrowControls( camera );
+//	scene.add( controls2.getObject() );
+//	setupArrowControls();
+//	animate2();
+
+
+clock = new THREE.Clock();
+
+	// http://threejs.org/examples/webgl_geometry_terrain_raycast.html
+	// Raycast Helper
+	var helpergeometry = new THREE.CylinderGeometry( 0, 2, 4, 3 ); // radius at top, radius at bottom, height, segments
+	helpergeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 0 ) );
+	//helpergeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+	helper = new THREE.Mesh( helpergeometry, new THREE.MeshBasicMaterial({ color: 0xEB1515, reflectivity: 0, wireframe: false }) );
+	helper.name = "Helper"
+	helpertoggle = true;
+
+
+	/*var pitchObject = new THREE.Object3D();
+	pitchObject.add( camera );
+	var yawObject = new THREE.Object3D();
+	yawObject.rotateZ = 90/180*Math.PI;
+	yawObject.add( pitchObject );
+*/
+
+
+	// Lighting
+	var ambientLight = new THREE.AmbientLight(0xE0E0E0, 0.05);
+	var directionalLight1 = new THREE.DirectionalLight( 0xfffaad, 0.6);
+	directionalLight1.shadowDarkness = 1
+	directionalLight1.position.set( 0, 1, 0 );
+	// var directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.6);
+	// directionalLight2.shadowDarkness = 1
+	// directionalLight2.position.set( 0, 1, 0 );
+
+	//hemi = new THREE.HemisphereLight(0x94E1FF, 0x852D10, 0.7)
+	//hemi.position.set( 0, 1, 0 );
+	scene.add( directionalLight1 );
+	//Create Scene
+	scene.add( ambientLight );
+	//scene.add(hemi)
+	scene.add( helper );
+
+	renderer.render(scene,camera);
+	render();
