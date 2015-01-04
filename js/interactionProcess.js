@@ -1,25 +1,56 @@
-		function is_inside_marquee(vector) {
-			widthHalf = canvasWidth / 2
-			heightHalf = canvasHeight / 2
-			x2D = ( vector.x * widthHalf ) + widthHalf;
-			y2D = - ( vector.y * heightHalf ) + heightHalf;
+		//function is_inside_marquee(vector) {
+			function is_inside_marquee(geomvector) {
 
-			marqueeMinY = marquee.position().top - canvasTopOffset
-			marqueeMinX = marquee.position().left - canvasLeftOffset
+// can take advantage of Version 69's unproject function which returns the real world coords of the marquee
+//			widthHalf = canvasWidth / 2
+//			heightHalf = canvasHeight / 2
+
+// looking for basic intersection of the mid point
+// could eventually replace with a ray-based intersection algorithm?
+
+			// first get the real world coords of the marquee
+//			x2D = ( vector.x * widthHalf ) + widthHalf;
+//			y2D = - ( vector.y * heightHalf ) + heightHalf;
+			//marqueeMinY = marquee.position().top - canvasTopOffset
+			//marqueeMinX = marquee.position().left - canvasLeftOffset
+			var marqueeTop = marquee.position().top - canvasTopOffset;
+			var marqueeLeft = marquee.position().left - canvasLeftOffset;
+			var marqueeBottom = marquee.position().top + marquee.height();
+			var marqueeRight = marquee.position().right;
+
+			var marqueeMinY = marqueeBottom;
+			var marqueeMinX = marqueeLeft;
+			console.log("marqueeminy " + marqueeMinY);
+			console.log("marqueeminx " + marqueeMinX);
 			marqueeMaxX = marqueeMinX + marquee.width();
-			marqueeMaxY = marqueeMinY + marquee.height();
+			marqueeMaxY = marqueeMinY - marquee.height();
 			var vector = new THREE.Vector3(marqueeMinX, marqueeMinY,0);
-			console.log("unproject "+vector.unproject(camera)); //returns undefined
-        	//vector.unproject( this.camera );
-			console.log(marqueeMinX + " "+ marqueeMinY + " "+marqueeMaxX + " " + marqueeMaxY);
-			if ( ((x2D > marqueeMinX) && (x2D < marqueeMaxX)) &&
-				 ((y2D > marqueeMinY) && (y2D < marqueeMaxY)) ) {
+			var vector2 = vector.unproject(camera);
+			console.log("marquee minimum: "+vector2.x + " "+vector2.y + " "+vector2.z);
+			var testMinX = vector2.x;
+			var textMinY = vector2.y;
+			vector = new THREE.Vector3(marqueeMaxX, marqueeMaxY,0);
+			vector2= vector.unproject(camera);
+			var textMaxX = vector2.x;
+			var testMaxY = vector2.y;
+			console.log("marquee maximum: "+vector2.x + " "+vector2.y + " "+vector2.z);
+
+
+			// now get the real world coords of the geometry from its bounding box
+			var geomX = geomvector.x;
+			var geomY = geomvector.y;
+
+//			console.log("unproject "+geomMinX+" "+geomMaxX + " " + geomMinY + " "+geomMaxY); //returns undefined
+			if ( ((geomX > testMinX) && (geomX < testMaxX)) &&
+				 ((geomY > testMinY) && (geomY < testMaxY))) {
+				console.log("inside");
 				return true;
 				}
 			else {
 				return false
 			}
 		}
+
 			function hoverrows() {
 				$('tr').click(function () {
 					$('tr').removeClass('selected');

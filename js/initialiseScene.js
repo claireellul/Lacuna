@@ -10,6 +10,8 @@ function init() {
 	canvaswidth = $( "#container" ).width()
 	console.log("Canvas Width: ", canvaswidth)
 	console.log("Canvas Height: ", canvasheight)
+	//CENTROID[0] = 5000;
+	//CENTROID[1] = 5000;
 
 	// Load Stats
 	stats = new Stats();
@@ -48,8 +50,13 @@ function init() {
 
 
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 1000 );
-	renderer = new THREE.WebGLRenderer({ antialias: true });
+
+	//camera =  new THREE.OrthographicCamera( canvasWidth / - 2, canvasWidth / 2, canvasHeight / 2, canvasHeight / - 2, 1, 1000 );
+	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	raycamera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	//renderer = new THREE.WebGLRenderer({ antialias: true });
+					renderer = new THREE.CanvasRenderer();
+
 	renderer.setSize( canvasWidth, canvasHeight );
 	container.appendChild( renderer.domElement );
 
@@ -70,19 +77,43 @@ function init() {
 	controls.minDistance = 50;
 	controls.maxDistance = 8000;
 	controls.keys = [ 65, 83, 68 ];
-	controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
+	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
 	controls.addEventListener( 'change', render );
+
+
+
+				//camera.position.set(centroid0-300, centroid1, 500 );
 
 	camera.position.x = CENTROID[0];
 	camera.position.y = CENTROID[1];
-	camera.position.z = 10;
+	camera.position.z = 50;
 
+	raycamera.position.x = CENTROID[0];
+	raycamera.position.y = CENTROID[1];
+	raycamera.position.z = 50;
 
 	// +ve z = out of the screen towards observer's eye
 	// +x = along the screen left/right
 	// +y =up the screen
 	// red is x
 	// green is y
+
+
+				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
+					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+					object.position.x =  CENTROID[0]-100;
+					object.position.y =  CENTROID[1];
+					object.position.z = 0;
+
+				//	object.scale.x =  200 + 1;
+				//	object.scale.y = 200 + 1;
+				//	object.scale.z = 50 + 1;
+
+
+					scene.add( object );
+					sceneobjects.push( object );
+
+
 
 	axes = new THREE.AxisHelper(400);
 	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
@@ -93,10 +124,11 @@ function init() {
 	console.log("Helper Axes Position : " , axes.position);
 
 	addAxesText(axes);
-	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
+	raycaster = new THREE.Raycaster(); // new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
 
 	//render = function () { requestAnimationFrame( render );
 	//renderer.render(scene, camera);};
+	camera.lookAt( scene.position );
 	animate();
 	addedToScene = []
 	visibleBools = []
@@ -184,4 +216,7 @@ function addLayers(){
 			} // visibleBools === true
 		}); // concat jslayer
 	}); // foreach function jslayer
+}
+function degInRad(deg) {
+    return deg * Math.PI / 180;
 }

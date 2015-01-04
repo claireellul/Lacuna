@@ -136,6 +136,7 @@ function loadTINData(aLayer, layerColour, layername){
 								id += 1
 								//console.log("Adding", tinzGroup)
 								scene.add(tinzGroup);
+								sceneobjects.push(tinzGroup);
 							});
 
 						}
@@ -154,8 +155,7 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 
 			//console.log(aLayerArray.length, ids.length);
 			aLayerArray.forEach( function(aFeature) {
-					//console.log( JSON.stringify(aFeature) );
-
+				// each one of these is a polyhedral surface representing one geometry
 				polyhedralzGroup = new THREE.Object3D();
 				aFeature = aFeature.slice(0, - 5); // Remove final :::
 				//ranCol = getRandomColor();
@@ -164,6 +164,7 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 				//console.log(aObjectArray.length);
 
 				aObjectArray.forEach( function(arrayModel) {
+
 					var uniqueCoords = [];
 					//console.log( JSON.stringify(arrayModel) );
 
@@ -223,20 +224,19 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 					// If the list isn't null or less than 3 triangulate it!
 					if (modelVertices != null && modelVertices.length >= 3) {
 						triangles = THREE.Shape.Utils.triangulateShape ( modelVertices, polyholes );
-
 						for( var i = 0; i < triangles.length; i++ ){
 							modelGeometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
 						}
-
 						modelGeometry.computeFaceNormals();
 						var modelMesh = new THREE.Mesh(modelGeometry, material);
 						modelMesh.material.side = THREE.DoubleSide;
 						//modelMesh.geometry.normalsNeedUpdate = true;
 						//console.log(modelMesh.geometry.normalsNeedUpdate);
 
-						polyhedralzGroup.add(modelMesh)
+						polyhedralzGroup.add(modelMesh);
+						sceneobjects.push(modelMesh);
 
-					}
+					} // create the individual faces
 					modelVertices = [];
 					modelCoords = [];
 
@@ -247,6 +247,7 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 
 				// Add group to scene
 				scene.add(polyhedralzGroup);
+
 				id += 1
 			});
 
@@ -319,6 +320,7 @@ function loadTinLayer(aLayer, layerColour, layername) {
 				id += 1
 				//console.log("Adding", tinzGroup)
 				scene.add(tinzGroup);
+				sceneobjects.push(tinzGroup);
 			});
 
 	}
@@ -356,6 +358,7 @@ function loadLineData(aLayer, layerColour, layername) {
 				idname = idname.concat(" ")
 				aLineMesh.name = idname.concat(ids[id].toString());
 				scene.add(aLineMesh);
+				sceneobjects.push(aLineMesh);
 				id += 1;
 			});
 
@@ -389,6 +392,7 @@ function loadPointZData(aLayer, layerColour, layername) {
 				idname = idname.concat(" ")
 				point.name =  idname.concat(ids[id].toString());
 				scene.add(point);
+				sceneobjects.push(point);
 				id += 1
 			});
 		}
@@ -518,6 +522,7 @@ function loadPolygonData(aLayer,layerColour,layername){
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + " " + ids[id].toString();
 						//console.log(modelMesh.name);
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 					}
 					catch(err) {
 						console.log(err)
@@ -570,6 +575,7 @@ if (faces != null) {
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + "_trinagles"  // temporary name + ids[id].toString();
 						console.log(modelMesh.name);
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 /*						scene.children.forEach( function(childLayer) {
 							if (childLayer.name != undefined || childLayer.name === "") {
 								if (childLayer.name.lastIndexOf('test', 0) === 0) {
@@ -615,6 +621,7 @@ function loadBulkTriangles (aLayer, layerColour,layername){
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + "bulktriangles";  //+ ids[id].toString();
 					//	modelMesh.name = 'test';
 						scene.add(modelMesh);
+						sceneobjects.push(modelMesh);
 /*						scene.children.forEach( function(childLayer) {
 							if (childLayer.name != undefined || childLayer.name === "") {
 								if (childLayer.name.lastIndexOf('test', 0) === 0) {

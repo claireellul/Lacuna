@@ -43,7 +43,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// internals
 
-	this.target = new THREE.Vector3();
+	// possible bug here - not taking target from the camera?
+	//	this.target = new THREE.Vector3();
+	this.target = camera.position;
 
 	var EPS = 0.000001;
 
@@ -105,7 +107,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	};
 
 	this.handleEvent = function ( event ) {
-		console.log("event type"+event.type);
 		//if ( typeof this[ event.type ] == 'function' ) {
 
 		//	this.[ event.type ]( event );
@@ -407,12 +408,10 @@ this.keyup = function (event) {
 
 //	function mousedown( event ) {
 this.mousedown= function (event) {
-	console.log("jjjj mousedown");
 		if ( _this.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
-console.log("state 2"+_state);
 		if ( _state === STATE.NONE ) {
 
 			_state = event.button;
@@ -445,12 +444,9 @@ console.log("state 2"+_state);
 
 //this.	function mousemove( event ) {
 this.mousemove = function (event) {
-console.log("jjjj mousemove1!");
 		if ( _this.enabled === false ) return;
-		console.log("jjjj mousemove2!");
 		event.preventDefault();
 		event.stopPropagation();
-		console.log(_state);
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
@@ -470,9 +466,7 @@ console.log("jjjj mousemove1!");
 
 //	function mouseup( event ) {
 this.mouseup = function(event) {
-	console.log("jjjjj mouse up");
 		if ( _this.enabled === false ) return;
-	console.log("jjjjj enabled");
 
 		event.preventDefault();
 		event.stopPropagation();

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js canvas - interactive - cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="js/threev69.js"></script>
+		<script src="js/Projector.js"></script>
+		<script src="js/CanvasRenderer.js"></script>
+		<script src="js/TrackballControlsModified.js"></script>
+		<script src="js/stats.min.js"></script>
+
+		<script>
+			var controls;
+			var centroid0 = 5000; var centroid1 = 5000;
+			var radius = 600;
+			var theta = 0;
+			var width; // the width of the canvas
+			var container, stats;
+			var camera, scene, renderer;
+			var raytracecamera;
+			var particleMaterial;
+
+			var raycaster;
+
+			var objects = [];
+
+			init();
+			animate();
+			render();
+			function init() {
+				var leftdiv = document.createElement( 'leftdiv' );
+				leftdiv.style.position = "absolute";
+				leftdiv.style.left = '10px';
+				leftdiv.style.width = '300px';
+				leftdiv.style.color = 'red';
+				leftdiv.style.backgroundColor = 'red';
+//				document.getElementById("leftdiv").style.display = "block";
+				document.body.appendChild( leftdiv );
+
+				container = document.createElement( 'div' );
+				container.id = "container";
+				container.style.position = "absolute";
+				container.style.left = "300px";
+				document.body.appendChild( container );
+				document.getElementById("container").style.border = "thick solid #0000FF";
+				var info = document.createElement( 'div' );
+				//info.style.position = 'absolute';
+				//info.style.top = '10px';
+				//info.style.width = '100%';
+				//info.style.textAlign = 'center';
+				//info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - clickable objects';
+				//container.appendChild( info );
+				//width = document.getElementById('container').clientWidth;
+				width = window.innerWidth - 300;
+				console.log("width is "+width);
+
+				camera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
+				camera.position.set(centroid0-300, centroid1, 500 );
+
+
+				raytracecamera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
+				raytracecamera.position.set(centroid0, centroid1, 500 );
+
+				scene = new THREE.Scene();
+
+    				var PI2 = Math.PI * 2;
+
+    particleMaterial = new THREE.SpriteCanvasMaterial( {
+
+        color: 0xff0000,
+        program: function ( context ) {
+
+            context.beginPath();
+            context.arc( 0, 0, 0.5, 0, PI2, true );
+            context.fill();
+
+        }
+
+    } );
+
+	//renderer = new THREE.WebGLRenderer({ antialias: true });
+//					renderer = new THREE.CanvasRenderer();
+
+	//renderer.setSize( canvasWidth, canvasHeight );
+	//container.appendChild( renderer.domElement );
+
+
+	// +ve z = out of the screen towards observer's eye
+	// +x = along the screen left/right
+	// +y =up the screen
+	// red is x
+	// green is y
+
+				raycaster = new THREE.Raycaster();
+				renderer = new THREE.CanvasRenderer();
+				//renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setSize( width, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+	controls.enabled = true;
+	controls.rotateSpeed = 0.6;
+	controls.zoomSpeed = 1.0;
+	controls.panSpeed = 1.0;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.minDistance = 50;
+	controls.maxDistance = 8000;
+	controls.keys = [ 65, 83, 68 ];
+	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
+	controls.addEventListener( 'change', render );
+
+				var geometry = new THREE.BoxGeometry( 400, 400, 400 );
+					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+					object.position.x =  centroid0;
+					object.position.y =  centroid1;
+					object.position.z = 0;
+
+				//	object.scale.x =  200 + 1;
+				//	object.scale.y = 200 + 1;
+				//	object.scale.z = 50 + 1;
+
+
+					scene.add( object );
+					objects.push( object );
+
+
+
+	axes = new THREE.AxisHelper(400);
+	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
+	axes.position.x = centroid0;
+	axes.position.y = centroid1;
+	axes.position.z = 0;
+	scene.add( axes );
+	console.log("Helper Axes Position : " , axes.position);
+
+				//
+
+				//stats = new Stats();
+				//stats.domElement.style.position = 'absolute';
+				//stats.domElement.style.top = '0px';
+				//container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+			// ray drawing functionality from : http://barkofthebyte.azurewebsites.net/post/2014/05/05/three-js-projecting-mouse-clicks-to-a-3d-scene-how-to-do-it-and-how-it-works
+			function addNewParticle(pos, scale)
+			{
+			    if( !scale )
+			    {
+			        scale = 16;
+			    }
+			    var particle = new THREE.Sprite( particleMaterial );
+			    particle.position = pos;
+			    console.log("particle pos "+pos.x + " "+pos.y + " "+pos.z);
+			    particle.scale.x = particle.scale.y = scale;
+			    scene.add( particle );
+			}
+function getFactorPos( val, factor, step )
+{
+    return step / factor * val;
+}
+
+			function drawParticleLine(pointA,pointB)
+			{
+			console.log("draw particle line");
+			    var factor = 10;
+			    for( var i = 0; i < factor; i++ )
+			    {
+			        var x = getFactorPos( pointB.x - pointA.x, factor, i );
+			        var y = getFactorPos( pointB.y - pointA.y, factor, i );
+			        var z = getFactorPos( pointB.z - pointA.z, factor, i );
+			        addNewParticle( new THREE.Vector3( pointA.x+x,pointA.y+y,pointA.z+z ), Math.max(2, width / 500 ) );
+			    }
+}
+function drawRayLine(rayCaster,width)
+{
+	//console.log("draw line");
+    var scale = width*2;
+    var rayDir = new THREE.Vector3(rayCaster.ray.direction.x*scale,rayCaster.ray.direction.y*scale,rayCaster.ray.direction.z*scale);
+    var rayVector = new THREE.Vector3(camera.position.x + rayDir.x, camera.position.y + rayDir.y, camera.position.z + rayDir.z);
+   // drawParticleLine(camera.position, rayVector);
+   //ranCol = getRandomColor();
+   drawLine(camera.position, rayVector,"0x0000ff");
+}
+
+			function onDocumentMouseDown( event ) {
+
+				event.preventDefault();
+
+				var vector = new THREE.Vector3();
+/*				console.log(width);
+				width = window.innerWidth - 300;
+				console.log("event x" +event.clientX);
+				console.log("event x - 300" +(event.clientX-300));
+				console.log("full value" +event.clientX/window.innerWidth);
+				console.log("partial value" +(event.clientX-300)/width);
+				parval = (event.clientX-300)/width * 2 -1;
+				console.log("partial value normalised: " +parval);
+				var test1 = (event.clientX - 300)/event.clientX;
+				var test2 = width/window.innerWidth;
+				scalefactor = test1/test2;
+				parval = (event.clientX-300)*scalefactor/width * 2 -1;
+				console.log("partial value scale factor normalised" +parval);
+				console.log("scale factor" +(test1/test2));
+				vector.set( ( event.clientX - (300) )/width * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+				console.log((event.clientX/width) * 2 - 1);
+				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
+				vector.unproject( raytracecamera );
+				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
+
+				// subtract the mouse vector from the camera vector
+				// create a unit vector using 'normalise'
+				// create a ray using the camera and this unit vector
+				raycaster.ray.set( raytracecamera.position, vector.sub( raytracecamera.position ).normalize() );
+				 //drawRayLine(raycaster,width);
+				 render();
+				  //requestAnimationFrame( animate );
+				console.log(objects[0].geometry);
+				var intersects = raycaster.intersectObjects( objects );
+*/
+
+				var vector = new THREE.Vector3();
+				var offset = 300;
+				width = window.innerWidth - 300;
+				var top = document.getElementById('container').style.top;
+				var height = document.getElementById('container').offsetHeight;
+				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
+				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
+				console.log("partial value X" +(event.clientX-offset)/width);
+				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
+				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
+				vector.unproject( camera );
+				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
+				// subtract the mouse vector from the camera vector
+				// create a unit vector using 'normalise'
+				// create a ray using the camera and this unit vector
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				 //drawRayLine(raycaster,width);
+				 render();
+				  //requestAnimationFrame( animate );
+				console.log(objects[0].geometry);
+				var intersects = raycaster.intersectObjects( objects );
+
+				if ( intersects.length > 0 ) {
+					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+					var particle = new THREE.Sprite( particleMaterial );
+					particle.position.copy( intersects[ 0 ].point );
+					particle.scale.x = particle.scale.y = 16;
+					scene.add( particle );
+				 //drawLine(camera.position,intersects[ 0 ].point,  "0xff0000");
+				 drawRayLine(raycaster,width);
+
+				} else {
+//					var particle = new THREE.Sprite( particleMaterial );
+//					particle.position.copy( vector.unproject(camera));
+//					particle.scale.x = particle.scale.y = 16;
+//					scene.add( particle );
+
+				}
+
+				/*
+				// Parse all the faces
+				for ( var i in intersects ) {
+
+					intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+
+				}
+				*/
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+//				stats.update();
+
+			}
+
+			var radius = 600;
+			var theta = 0;
+
+			function render() {
+
+				theta += 0.1;
+
+				camera.position.x = 5000+radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = 5000+radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+function drawLine(pointA, pointB, lineColor)
+{
+    var material = new THREE.LineBasicMaterial({
+            color: lineColor
+    });
+//	console.log(pointA.x+" "+pointB.x);
+//	console.log(pointA.y+" "+pointB.y);
+//	console.log(pointA.z+" "+pointB.z);
+    var geometry = new THREE.Geometry();
+    var max = 500*500;
+    if( Math.abs(pointA.x - pointB.x) < max && Math.abs(pointA.y - pointB.y) < max && Math.abs(pointA.z - pointB.z) < max )
+    {
+        geometry.vertices.push(pointA);
+        geometry.vertices.push(pointB);
+
+        var line = new THREE.Line(geometry, material);
+        scene.add(line);
+    }
+    else
+    {
+        console.debug(pointA.x.toString() + ':' + pointA.y.toString() + ':' + pointA.z.toString()  + ':' +
+                    pointB.x.toString() + ':' + pointB.y.toString()  + ':' + pointB.z.toString());
+    }
+}
+
+		</script>
+
+	</body>
+</html>
