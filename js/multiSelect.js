@@ -1,4 +1,81 @@
+function calculateIntersection(camera,vector,changeColour,drawPoint, intersectObjects){
+	// take the screen click vector which has been rescaled so that the value of x and y is between -1 and + 1
+	// and that 0,0 is in the middle and axes are pointing in three.js directions not screen direction
+	// convert it to a real world point close to the camera
+	// draw a ray from the camera through this point to the geometetry in the scene
+	// intersect the ray with the geometry
+	// optionally, change the colour of the geometry and draw the intersection point
+	// return the array of intersected objects for further processing - e.g. get attributes, info etc.
+
+					vector.unproject( camera );
+					// nb: the ray caster is set to intersect ANY object in the ray not just the first
+					raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize(),true );
+					var intersects = raycaster.intersectObjects( intersectObjects );
+					if ( intersects.length > 0 ) {
+						if (drawPoint===true) {
+								var PI2 = Math.PI * 2;
+								var    particleMaterial = new THREE.SpriteCanvasMaterial( {
+						        color: 0xff0000,
+						        program: function ( context ) {
+						            context.beginPath();
+						            context.arc( 0, 0, 0.5, 0, PI2, true );
+						            context.fill();
+								}
+							 	} );
+								var particle = new THREE.Sprite( particleMaterial );
+								particle.position.copy( intersects[ 0 ].point );
+								particle.scale.x = particle.scale.y = 1;
+								scene.add( particle );
+						}
+						if (changeColour===true) {
+							var colour =  Math.random() * 0xffffff;
+							for (i = 0;i < intersects.length; i ++) {
+								intersects[ i ].object.material.color.setHex(colour );
+							}
+						}
+						return intersects;
+					}
+}
+
+function rescaleAndCentre(screenPointX, screenPointY){
+
+	// screen coords are 2d and have +y running top to bottom with the origin at top left
+	// threejs coords are 3d, have +y running bottom to top, with the origin at the centre
+	// this function rescales and shifts the mouse click event into threejs coords
+	// with resulting x and y values from -1 to + 1
+
+	// NB:  this function needs a FIXED POSITION div to work, which must have hard coded top and left values
+	// setting teh DIV size for the canvas using %width or %height fails
+
+	// with a fixed position div
+	var offset = 350; //document.getElementById('container').style.left;
+	var top = 47; //document.getElementById('container').style.top;
+	var height = document.getElementById('container').offsetHeight;
+
+	// use a small shrinkage factor as this seems to improve click accuracy?
+	var width = document.getElementById('container').clientWidth-20;
+
+	var partialY = -((screenPointY - top)/height) * 2 + 1;
+	var partialX = (screenPointX-offset)/width*2 -1;
+	console.log("Partial X and Y "+partialX + " "+partialY);
+	var vector = new THREE.Vector3();
+	vector.set( partialX, partialY, 0.5 );
+	return vector;
+}
+
 function make_multi_selection() {
+
+	// idea for multi-select
+	// take the marquee boundaries
+	// find out where they intersect the 2D surface of the world by creating a 'fake' geometry
+	// use this as the MBR
+	// same method can be used for dynamic data retrieval
+	// then project the 3D scene data into 2D
+	// and calculate teh intersection
+	// use vector maths for the 'fake' geometry - take the line, and calculate the intersection point with z = 0 plane;
+
+	// or use PROJECT ON PLANE functionality provided by three.js?
+
 		scene.children.forEach( function(o) {
 			isMesh = (o instanceof THREE.Mesh);
 			isObject3D = (o instanceof THREE.Object3D);
