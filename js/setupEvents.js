@@ -71,14 +71,31 @@ function setupEvents(){
 				console.log(sceneobjects[0].geometry)
 				var intersects = raycaster.intersectObjects( sceneobjects,true );
 */
+				console.log("original x and y clicked" + "  "+event.clientX + " " +event.clientY );
 				var vector = new THREE.Vector3();
-				var offset = window.innerWidth * 0.25;
-				var width=window.innerWidth * 0.75;
-				var top = document.getElementById('container').style.top;
+				// this code works with width = 74% but causes offsets on the click events
+				// fixed width divs work better
+				//var offset = window.innerWidth * 0.25;
+				//var width=window.innerWidth * 0.75;
+				//var top = document.getElementById('topbar').clientHeight;
+				//var height = document.getElementById('container').clientHeight;
+
+
+				// with a fixed position div
+				var offset = 350;//document.getElementById('container').style.left;
+				//var width = window.innerWidth - offset;
+				var top = 47 ; //document.getElementById('container').style.top;
 				var height = document.getElementById('container').offsetHeight;
+
+				// nb problem is worse when value is too large
+				var width = document.getElementById('container').clientWidth-20;
+
+				console.log(offset + "  "+height + " " +top + " " +width);
 				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
-				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
-				console.log("partial value X" +(event.clientX-offset)/width);
+				var partialY = -((event.clientY - top)/height) * 2 + 1;
+				console.log("partial value Y " + partialY);
+				var partialX = (event.clientX-offset)/width*2 -1;
+				console.log("partial value X" +partialX);
 				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
 				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
 				vector.unproject( camera );
@@ -97,12 +114,10 @@ function setupEvents(){
 
 				if ( intersects.length > 0 ) {
 					console.log("itersect abc");
-var PI2 = Math.PI * 2;
-var    particleMaterial = new THREE.SpriteCanvasMaterial( {
-
+							var PI2 = Math.PI * 2;
+							var    particleMaterial = new THREE.SpriteCanvasMaterial( {
 					        color: 0xff0000,
 					        program: function ( context ) {
-
 					            context.beginPath();
 					            context.arc( 0, 0, 0.5, 0, PI2, true );
 					            context.fill();
@@ -114,7 +129,7 @@ var    particleMaterial = new THREE.SpriteCanvasMaterial( {
 					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 					var particle = new THREE.Sprite( particleMaterial );
 					particle.position.copy( intersects[ 0 ].point );
-					particle.scale.x = particle.scale.y = 16;
+					particle.scale.x = particle.scale.y = 1;
 					scene.add( particle );
 				} else {
 					/*				var PI2 = Math.PI * 2;

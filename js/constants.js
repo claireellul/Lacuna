@@ -2,6 +2,7 @@
 // Declare constants
 var sceneobjects = []; // stores all the objects in a scene
 var camera, scene, renderer, controls;
+var raycamera; // a fixed camera to use for ray tracing
 var helper;
 var intersectedPoint = ""
 var ACTION = false;

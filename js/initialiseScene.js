@@ -10,8 +10,8 @@ function init() {
 	canvaswidth = $( "#container" ).width()
 	console.log("Canvas Width: ", canvaswidth)
 	console.log("Canvas Height: ", canvasheight)
-	CENTROID[0] = 5000;
-	CENTROID[1] = 5000;
+	//CENTROID[0] = 5000;
+	//CENTROID[1] = 5000;
 
 	// Load Stats
 	stats = new Stats();
@@ -53,6 +53,7 @@ function init() {
 
 	//camera =  new THREE.OrthographicCamera( canvasWidth / - 2, canvasWidth / 2, canvasHeight / 2, canvasHeight / - 2, 1, 1000 );
 	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	raycamera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
 	//renderer = new THREE.WebGLRenderer({ antialias: true });
 					renderer = new THREE.CanvasRenderer();
 
@@ -83,10 +84,13 @@ function init() {
 
 				//camera.position.set(centroid0-300, centroid1, 500 );
 
-	camera.position.x = CENTROID[0]-300;
+	camera.position.x = CENTROID[0];
 	camera.position.y = CENTROID[1];
-	camera.position.z = 500;
+	camera.position.z = 50;
 
+	raycamera.position.x = CENTROID[0];
+	raycamera.position.y = CENTROID[1];
+	raycamera.position.z = 50;
 
 	// +ve z = out of the screen towards observer's eye
 	// +x = along the screen left/right
@@ -95,7 +99,7 @@ function init() {
 	// green is y
 
 
-				var geometry = new THREE.BoxGeometry( 400, 400, 400 );
+				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
 					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
 					object.position.x =  CENTROID[0];
 					object.position.y =  CENTROID[1];
@@ -124,6 +128,7 @@ function init() {
 
 	//render = function () { requestAnimationFrame( render );
 	//renderer.render(scene, camera);};
+	camera.lookAt( scene.position );
 	animate();
 	addedToScene = []
 	visibleBools = []

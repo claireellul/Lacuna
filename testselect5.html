@@ -23,13 +23,13 @@
 
 		<script>
 			var controls;
-			//var centroid0 = 5000; var centroid1 = 5000;
-			var centroid0 = 529546.515278995; var centroid1 = 182219.7872209245;
+			var centroid0 = 5000; var centroid1 = 5000;
 			var radius = 600;
 			var theta = 0;
 			var width; // the width of the canvas
 			var container, stats;
 			var camera, scene, renderer;
+			var raytracecamera;
 			var particleMaterial;
 
 			var raycaster;
@@ -53,8 +53,6 @@
 				container.id = "container";
 				container.style.position = "absolute";
 				container.style.left = "300px";
-				container.style.top = "100px";
-
 				document.body.appendChild( container );
 				document.getElementById("container").style.border = "thick solid #0000FF";
 				var info = document.createElement( 'div' );
@@ -69,7 +67,11 @@
 				console.log("width is "+width);
 
 				camera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
-				camera.position.set(centroid0, centroid1, 500 );
+				camera.position.set(centroid0-300, centroid1, 500 );
+
+
+				raytracecamera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
+				raytracecamera.position.set(centroid0, centroid1, 500 );
 
 				scene = new THREE.Scene();
 
@@ -218,7 +220,6 @@ function drawRayLine(rayCaster,width)
 				var vector = new THREE.Vector3();
 /*				console.log(width);
 				width = window.innerWidth - 300;
-				height = window.innerHeight - 100;
 				console.log("event x" +event.clientX);
 				console.log("event x - 300" +(event.clientX-300));
 				console.log("full value" +event.clientX/window.innerWidth);
@@ -231,16 +232,16 @@ function drawRayLine(rayCaster,width)
 				parval = (event.clientX-300)*scalefactor/width * 2 -1;
 				console.log("partial value scale factor normalised" +parval);
 				console.log("scale factor" +(test1/test2));
-				vector.set( ( event.clientX - (300) )/width * 2 - 1, - ( event.clientY-100 /height ) * 2 + 1, 0.5 );
+				vector.set( ( event.clientX - (300) )/width * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				console.log((event.clientX/width) * 2 - 1);
 				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
-				vector.unproject( camera );
+				vector.unproject( raytracecamera );
 				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
 
 				// subtract the mouse vector from the camera vector
 				// create a unit vector using 'normalise'
 				// create a ray using the camera and this unit vector
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( raytracecamera.position, vector.sub( raytracecamera.position ).normalize() );
 				 //drawRayLine(raycaster,width);
 				 render();
 				  //requestAnimationFrame( animate );
@@ -251,8 +252,8 @@ function drawRayLine(rayCaster,width)
 				var vector = new THREE.Vector3();
 				var offset = 300;
 				width = window.innerWidth - 300;
-				var top = 100; //document.getElementById('container').style.top;
-				var height = document.getElementById('container').clientHeight;
+				var top = document.getElementById('container').style.top;
+				var height = document.getElementById('container').offsetHeight;
 				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
 				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
 				console.log("partial value X" +(event.clientX-offset)/width);
@@ -312,14 +313,14 @@ function drawRayLine(rayCaster,width)
 
 			function render() {
 
-/*				theta += 0.1;
+				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.x = 5000+radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = 5000+radius * Math.sin( THREE.Math.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 
 				camera.lookAt( scene.position );
-*/
+
 				renderer.render( scene, camera );
 
 			}
