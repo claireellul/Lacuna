@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - interactive - cubes</title>
+		<title>three.js canvas - Working Select with the canvas offset top and left with fixed points, lacuna imitation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -274,12 +274,12 @@ function drawRayLine(rayCaster,width)
 
 
 				// with a fixed position div
-				var offset = 300;//document.getElementById('container').style.left;
-				var width = window.innerWidth - offset;
+				var offset = 350;//document.getElementById('container').style.left;
+				//var width = window.innerWidth - offset;
 				var top = 47 ; //document.getElementById('container').style.top;
 				//var height = window.innerHeight - top; //document.getElementById('container').clientHeight;
 				var height = document.getElementById('container').clientHeight;
-
+				var width = document.getElementById('container').clientWidth-20;
 
 				console.log(offset + "  height "+height + " top " +top + " width " +width);
 				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0);

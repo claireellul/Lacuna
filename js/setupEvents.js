@@ -109,6 +109,13 @@ function setupEvents(){
 				 render();
 				  //requestAnimationFrame( animate );
 				console.log(sceneobjects[0].geometry);
+				try {
+					console.log(sceneobjects[1].geometry);
+				} catch (e) {}
+
+				try {
+					console.log(sceneobjects[2].geometry);
+				} catch (e) {}
 				var intersects = raycaster.intersectObjects( sceneobjects );
 
 

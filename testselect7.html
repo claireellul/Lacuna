@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - working select with top and left offset, fixed px div</title>
+		<title>three.js canvas - Working select with geometry instead of 'box' object</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -14,48 +14,62 @@
 		</style>
 	</head>
 	<body>
+		<link rel="stylesheet" href="css/Lacuna.css">
 
 		<script src="js/threev69.js"></script>
 		<script src="js/Projector.js"></script>
 		<script src="js/CanvasRenderer.js"></script>
 		<script src="js/TrackballControlsModified.js"></script>
 		<script src="js/stats.min.js"></script>
+		<div id="topbar">
+		</div>
+		<div id="main">
+				<div id="info">
+					<div id="layerscontainer">
+					</div>
+					<div id="attributes">
+					</div>
+				</div>
+				<div id="container" tabindex=0>
+				</div>
+		</div>
 
 		<script>
+
 			var controls;
 			//var centroid0 = 5000; var centroid1 = 5000;
 			var centroid0 = 529546.515278995; var centroid1 = 182219.7872209245;
 			var radius = 600;
 			var theta = 0;
 			var width; // the width of the canvas
-			var container, stats;
+			var  stats;
 			var camera, scene, renderer;
 			var particleMaterial;
 
 			var raycaster;
 
 			var objects = [];
-
+var container = document.getElementById('container');
 			init();
 			animate();
 			render();
 			function init() {
-				var leftdiv = document.createElement( 'leftdiv' );
+/*				var leftdiv = document.createElement( 'leftdiv' );
 				leftdiv.style.position = "absolute";
 				leftdiv.style.left = '10px';
 				leftdiv.style.width = '300px';
 				leftdiv.style.color = 'red';
 				leftdiv.style.backgroundColor = 'red';
-//				document.getElementById("leftdiv").style.display = "block";
 				document.body.appendChild( leftdiv );
-
-				container = document.createElement( 'div' );
+*/
+/*				container = document.createElement( 'div' );
 				container.id = "container";
 				container.style.position = "absolute";
 				container.style.left = "300px";
 				container.style.top = "100px";
 
 				document.body.appendChild( container );
+*/
 				document.getElementById("container").style.border = "thick solid #0000FF";
 				var info = document.createElement( 'div' );
 				//info.style.position = 'absolute';
@@ -69,7 +83,7 @@
 				console.log("width is "+width);
 
 				camera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
-				camera.position.set(centroid0, centroid1, 500 );
+				camera.position.set(centroid0-300, centroid1, 500 );
 
 				scene = new THREE.Scene();
 
@@ -133,9 +147,38 @@
 				//	object.scale.y = 200 + 1;
 				//	object.scale.z = 50 + 1;
 
-
 					scene.add( object );
 					objects.push( object );
+
+
+				var modelGeometry = new THREE.Geometry();
+				var theVertices=[];
+				theVertices.push(new THREE.Vector3( centroid0, centroid1 , 0));
+				theVertices.push(new THREE.Vector3( centroid0+500, centroid1 , 0));
+				theVertices.push(new THREE.Vector3( centroid0+500, centroid1+100 , 0));
+				modelGeometry.vertices = theVertices;
+				modelGeometry.faces.push(new THREE.Face3(0,1,2));
+				var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } );
+				var modelMesh = new THREE.Mesh(modelGeometry, material);
+				modelMesh.material.side = THREE.DoubleSide;
+				modelMesh.name =  "triangle1";
+				scene.add(modelMesh);
+				objects.push(modelMesh);
+
+
+				var modelGeometry = new THREE.Geometry();
+				var theVertices=[];
+				theVertices.push(new THREE.Vector3( centroid0, centroid1 , 0));
+				theVertices.push(new THREE.Vector3( centroid0-500, centroid1 , 50));
+				theVertices.push(new THREE.Vector3( centroid0-500, centroid1-100 , 50));
+				modelGeometry.vertices = theVertices;
+				modelGeometry.faces.push(new THREE.Face3(0,1,2));
+				var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } );
+				var modelMesh = new THREE.Mesh(modelGeometry, material);
+				modelMesh.material.side = THREE.DoubleSide;
+				modelMesh.name =  "triangle1";
+				scene.add(modelMesh);
+				objects.push(modelMesh);
 
 
 
@@ -217,21 +260,21 @@ function drawRayLine(rayCaster,width)
 
 				var vector = new THREE.Vector3();
 /*				console.log(width);
-				width = window.innerWidth - 350;
-				height = window.innerHeight - 47;
+				width = window.innerWidth - 300;
+				height = window.innerHeight - 100;
 				console.log("event x" +event.clientX);
 				console.log("event x - 300" +(event.clientX-300));
 				console.log("full value" +event.clientX/window.innerWidth);
 				console.log("partial value" +(event.clientX-300)/width);
-				parval = (event.clientX-350)/width * 2 -1;
+				parval = (event.clientX-300)/width * 2 -1;
 				console.log("partial value normalised: " +parval);
-				var test1 = (event.clientX - 350)/event.clientX;
+				var test1 = (event.clientX - 300)/event.clientX;
 				var test2 = width/window.innerWidth;
 				scalefactor = test1/test2;
-				parval = (event.clientX-350)*scalefactor/width * 2 -1;
+				parval = (event.clientX-300)*scalefactor/width * 2 -1;
 				console.log("partial value scale factor normalised" +parval);
 				console.log("scale factor" +(test1/test2));
-				vector.set( ( event.clientX - (350) )/width * 2 - 1, - ( event.clientY-100 /height ) * 2 + 1, 0.5 );
+				vector.set( ( event.clientX - (300) )/width * 2 - 1, - ( event.clientY-100 /height ) * 2 + 1, 0.5 );
 				console.log((event.clientX/width) * 2 - 1);
 				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
 				vector.unproject( camera );
@@ -248,18 +291,36 @@ function drawRayLine(rayCaster,width)
 				var intersects = raycaster.intersectObjects( objects );
 */
 
+				console.log("original x and y clicked" + "  "+event.clientX + " " +event.clientY );
 				var vector = new THREE.Vector3();
-				var offset = 300;
-				width = window.innerWidth - 300;
-				var top = 100; //document.getElementById('container').style.top;
+
+				// with a %width div
+				//var offset = window.innerWidth * 0.26;
+				//var width=window.innerWidth * 0.74;
+				//var top = document.getElementById('topbar').clientHeight;
+				//var height = document.getElementById('container').clientHeight;
+
+
+
+				// with a fixed position div
+				var offset = 350;//document.getElementById('container').style.left;
+				//var width = window.innerWidth - offset;
+				var top = 47 ; //document.getElementById('container').style.top;
+				//var height = window.innerHeight - top; //document.getElementById('container').clientHeight;
 				var height = document.getElementById('container').clientHeight;
-				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0.5 );
-				console.log("partial value Y " + (-((event.clientY - top)/height) * 2 + 1));
-				console.log("partial value X" +(event.clientX-offset)/width);
+				var width = document.getElementById('container').clientWidth-20;
+
+				console.log(offset + "  height "+height + " top " +top + " width " +width);
+				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0);
+				var partialY = -((event.clientY - top)/height) * 2 + 1;
+				console.log("partial value Y " + partialY);
+				var partialX = (event.clientX-offset)/width*2 -1;
+				console.log("partial value X" +partialX);
 				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
 				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
 				vector.unproject( camera );
 				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
+
 				// subtract the mouse vector from the camera vector
 				// create a unit vector using 'normalise'
 				// create a ray using the camera and this unit vector

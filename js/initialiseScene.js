@@ -101,7 +101,7 @@ function init() {
 
 				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
 					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
-					object.position.x =  CENTROID[0];
+					object.position.x =  CENTROID[0]-100;
 					object.position.y =  CENTROID[1];
 					object.position.z = 0;
 
