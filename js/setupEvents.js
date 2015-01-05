@@ -1,20 +1,20 @@
-				// MULTISELECT
-				var marquee = $("#select-marquee")
-				var offset = {};
-				var keyIsPressed = false
-				var firstKeyPress = false
-				var keyPressedCoords = {x: 0, y: 0};
-				var canvasLeftOffset = $( "#info" ).width();
-				var canvasTopOffset = $( "#topbar").height();
-				var canvasWidth = window.innerWidth -  canvasLeftOffset;
-				var	canvasHeight = window.innerHeight - canvasTopOffset;
-				// CLICK HANDLER
-				var firstClick = true
-				var objectFirstClick = true
-				var p1
-				var p2
-				var l1
-				var l2
+// MULTISELECT
+var marquee = $("#select-marquee")
+var offset = {};
+var keyIsPressed = false
+var firstKeyPress = false
+var keyPressedCoords = {x: 0, y: 0};
+var canvasLeftOffset = $( "#info" ).width();
+var canvasTopOffset = $( "#topbar").height();
+var canvasWidth = window.innerWidth -  canvasLeftOffset;
+var	canvasHeight = window.innerHeight - canvasTopOffset;
+// CLICK HANDLER
+var firstClick = true
+var objectFirstClick = true
+var p1
+var p2
+var l1
+var l2
 
 function cancelEvents(){
 	// clear all the interaction events that are interacting with the canvas
@@ -68,7 +68,6 @@ function setupEvents(){
 				$("#container").mousemove(function(event){
 					if ((keyIsPressed === true) && ((MULTISELECT === true) && (SELECT === false)) ) {
 						if ((keyPressedCoords.x === 0) && (keyPressedCoords.y === 0)) {
-							//console.log("setting initial coords");
 							keyPressedCoords.x = event.clientX;
 							keyPressedCoords.y = event.clientY;
 							firstKeyPress = false
@@ -96,8 +95,6 @@ function setupEvents(){
 					}
 			});
 				$(document).keydown( function(event) {
-					console.log("keydown "+SELECT + " " + MULTISELECT + " "+select);
-					console.log("document keydown");
 					if ((MULTISELECT === true) && (SELECT === false)) {
 						code = event.keyCode || event.which;
 						keyIsM = ((String.fromCharCode(code) == "m") ||  (String.fromCharCode(code) == "M" ))
@@ -114,21 +111,16 @@ function setupEvents(){
 
 				// if the escape key is pressed, then cancel all functionality and go back to zoom mode
 				if(e.keyCode == 27){
-					console.log("escape pressed");
 					interactionMode = "ZOOM";
 					changeInteractionMode(interactionMode);
 				}
 
-				console.log("document keyup");
-				console.log("keyup "+SELECT + " " + MULTISELECT + " "+select);
 				if (MULTISELECT === true) {
 					keyIsM = ((String.fromCharCode(code) == "m") ||  (String.fromCharCode(code) == "M" ))
-					console.log("m "+ keyIsM + " firstkey press "+firstKeyPress + " "+keyPressedCoords.y);
 					if ((keyIsM === true) && (firstKeyPress === false) && (keyPressedCoords.y !=0) &&(keyPressedCoords.x != 0)) {
 						firstKeyPress = false;
 						// m was pressed again to close the selection
 						make_multi_selection();
-						//console.log("key let go");
 						keyIsPressed = false;
 						keyPressedCoords = {x: 0, y: 0};
 						marquee.fadeOut();
@@ -138,37 +130,23 @@ function setupEvents(){
 				}
 			});
 			$(document).on('keypress', function (e) {
-				console.log("document keypress");
-				//console.log(e);
 				var code = e.keyCode || e.which;
-				//console.log(code);
-
-
 
 				keyIsM = ((String.fromCharCode(code) == "m") ||  (String.fromCharCode(code) == "M" ))
 				objectIsIntersected = ((intersectedObject !== "" ) || ( intersectedMesh !== "" ))
 
 				if ( SELECT && keyIsM && objectIsIntersected ){
-					console.log("m and select");
 					aObject3D = ((intersectedObject instanceof THREE.Object3D === true ) && intersectedObject instanceof THREE.Scene === false && intersectedMesh instanceof THREE.AxisHelper === false );
 					aMeshObject = ((intersectedMesh instanceof THREE.Mesh === true ) && (intersectedObject instanceof THREE.Scene === true ));
 					aLineObject = (intersectedMesh instanceof THREE.Line === true && intersectedMesh instanceof THREE.AxisHelper === false );
-					//console.log(aObject3D, aMeshObject, aLineObject);
 					if ( aObject3D || aMeshObject || aLineObject ) {
-						//console.log($.inArray(intersectedObject, SELECTED), SELECTED)
-						//console.log(aObject3D);
-						//console.log();
 						if (aObject3D === true) { inSelected = SELECTED.sceneobject.indexOf(intersectedObject) }
 						else if (aLineObject === true || aMeshObject === true ) { inSelected = SELECTED.sceneobject.indexOf(intersectedMesh) }
-						//console.log(inSelected)
 
 						// If object hasn't been selected
 						if (inSelected  === -1) {
 
-							//console.log(intersectedObject)
 							 if (aObject3D === true) {
-								//console.log(intersectedObject)
-								console.log(intersectedObject);
 								colorArray = [];
 
 								intersectedObject.children.forEach( function(child, childIndex) {
@@ -178,15 +156,12 @@ function setupEvents(){
 									child.material.color.setHex( 0xCCCCCC )
 									if (child.material.hasOwnProperty("ambient")) { child.material.ambient.setHex( 0xCCCCCC ) }
 								});
-								console.log("adding ", intersectedObject, " to SELECTED");
 								SELECTED.sceneobject.push(intersectedObject)
 								SELECTED.color.push(objectColour)
-								console.log(SELECTED);
 
 							}
 
 							else if ((aLineObject === true || aMeshObject === true) && (intersectedMesh.name != "Helper")) {
-								console.log("adding ", intersectedMesh, " to SELECTED");
 								SELECTED.sceneobject.push(intersectedMesh)
 								SELECTED.color.push(intersectedMesh.material.color.clone())
 								intersectedMesh.material.color.setHex( 0xCCCCCC )
@@ -200,20 +175,15 @@ function setupEvents(){
 
 							if (aObject3D === true) {
 								intersectedObject.children.forEach( function(child, colIndex) {
-									console.log(SELECTED.color[inSelected])
 									child.material.color.set( SELECTED.color[inSelected] )
 									if (child.material.hasOwnProperty("ambient")) { child.material.ambient.setHex( SELECTED.color[inSelected] ) }
 
 								});
-								//console.log("removing ", intersectedObject, " to SELECTED");
 								SELECTED.sceneobject.splice(inSelected, 1);
-								//console.log(SELECTED.sceneobject);
 								SELECTED.color.splice(inSelected, 1);
 							}
 
 							else if ((aLineObject === true || aMeshObject === true) && (intersectedMesh.name != "Helper")) {
-
-								//console.log("remove color",
 								intersectedMesh.material.color.set( SELECTED.color[inSelected] )
 								if (intersectedMesh.material.hasOwnProperty("ambient")) { intersectedMesh.material.ambient = SELECTED.color[inSelected] }
 								SELECTED.sceneobject.splice(inSelected, 1);
@@ -262,7 +232,6 @@ function changeInteractionMode(newMode) {
 			// clear any marquee
 			marquee.fadeOut();
 
-			console.log("zoom mode is "+ controlsMode);
 			// create the required zoom/pan controls depending on the last used interaction mode
 			setupControls(controlsMode);
 	}
@@ -283,7 +252,6 @@ function setupControls(controlsMode) {
 	// add functionality to highlight where the user clicks
 
 	$('#container').click( function(event) {
-		console.log("container click");
 		// first rescale and recentre the click
 		var vector = rescaleAndCentre(event.clientX,event.clientY);
 		var intersection = calculateIntersection(camera,vector, true, true, sceneobjects);
@@ -296,7 +264,6 @@ function setupControls(controlsMode) {
 		controls = null;
 	}
 	if (controlsMode == "TRACKBALL") {
-		console.log("trackball clicked");
 		controls = new THREE.TrackballControls( camera, renderer.domElement );
 		controls.enabled = true;
 		controls.rotateSpeed = 0.6;
@@ -323,7 +290,6 @@ function setupControls(controlsMode) {
 	   controls.dragToLook = true;
 	}
 	if (controlsMode == "FIRSTPERSON") {
-		console.log("firstperson clicked");
 		controls = new THREE.FirstPersonControls(camera);
 		controls.lookSpeed = 0.4;
 		controls.movementSpeed = 20;

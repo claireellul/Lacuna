@@ -37,23 +37,10 @@
 				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 				cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				frustum.setFromMatrix( cameraViewProjectionMatrix );
-
-
 				// frustum is now ready to check all the objects you need
-//				console.log( JSON.stringify(camera.matrixWorld));
-//				console.log( JSON.stringify(camera.matrixWorldInverse));
-//				console.log( JSON.stringify(camera.projectionMatrix));
-//				console.log( JSON.stringify(frustum));
 
 
 			}
 
 
 
-		/*	function render(scene,camera) {
-
-	//renderer.render( scene, camera );
-				requestAnimationFrame( render );
-				stats.update();
-			}
-*/

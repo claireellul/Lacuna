@@ -17,7 +17,6 @@
 	}
 
 	function closestVertex(point, object) {
-		//console.log(point);
 		// Point is Vector3
 		var dist = -1
 		var closest
@@ -27,7 +26,6 @@
 		if (object.hasOwnProperty("children") && object.children.length != 0 ) {
 			object.children.forEach( function(child) {
 				child.geometry.vertices.forEach( function(v) {
-					//console.log(point.distanceTo(v))
 					if (dist === -1) {
 						dist = point.distanceTo(v)
 						closest = v

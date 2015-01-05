@@ -1,4 +1,3 @@
-
 	console.log("Layers and Attribute divs positioned");
 	$("#layerscontainer").resizable({ });
 	$("#layerscontainer").bind("resize", function () {
@@ -14,4 +13,3 @@
 		$("#attributes").perfectScrollbar('update');
 		});
 
-		

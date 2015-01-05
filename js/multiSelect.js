@@ -58,7 +58,6 @@ function rescaleAndCentre(screenPointX, screenPointY){
 
 	var partialY = -((screenPointY - top)/height) * 2 + 1;
 	var partialX = (screenPointX-offset)/width*2 -1;
-	console.log("Partial X and Y "+partialX + " "+partialY);
 	var vector = new THREE.Vector3();
 	vector.set( partialX, partialY, 0.5 );
 	return vector;
@@ -79,26 +78,20 @@ function make_multi_selection() {
 	// a temporary array for the base object
 	var baseArray = [];
 	baseArray.push(scene.getObjectByName( "baseGeometry" ));
-	console.log(baseArray[0]);
-	console.log("marquee values top left bottom right "+marqueeTop + " "+marqueeLeft + " "+marqueeBottom + " "+marqueeRight);
 
 	// get the intersection vector with the base geometry only to get the 2D MBR
 	var vector = rescaleAndCentre(marqueeLeft,marqueeTop);
 	var intersection1 = calculateIntersection(camera,vector, false, false, baseArray);
-	console.log(intersection1[0].point);
 
 	// get the intersection vector with the base geometry only to get the 2D MBR
 	var vector = rescaleAndCentre(marqueeLeft,marqueeBottom);
 	var intersection2 = calculateIntersection(camera,vector, false, false, baseArray);
-	console.log(intersection2[0].point);
 
 	var vector = rescaleAndCentre(marqueeRight,marqueeTop);
 	var intersection3 = calculateIntersection(camera,vector, false, false, baseArray);
-	console.log(intersection3[0].point);
 
 	var vector = rescaleAndCentre( marqueeRight,marqueeBottom);
 	var intersection4 = calculateIntersection(camera,vector, false, false, baseArray);
-	console.log(intersection4[0].point);
 
 	// then project the 3D scene data into 2D
 	// and calculate teh intersection

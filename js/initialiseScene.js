@@ -6,8 +6,6 @@ function init() {
 	//Create the width and heights using some jQuery magic
 	canvasheight = $( "#container" ).height()
 	canvaswidth = $( "#container" ).width()
-	console.log("Canvas Width: ", canvaswidth)
-	console.log("Canvas Height: ", canvasheight)
 
 	// Load Stats
 	stats = new Stats();
@@ -91,7 +89,6 @@ function init() {
 	axes.position.y = CENTROID[1];
 	axes.position.z = 0;
 	scene.add( axes );
-	console.log("Helper Axes Position : " , axes.position);
 
 	addAxesText(axes);
 	raycaster = new THREE.Raycaster();
@@ -144,7 +141,6 @@ function addAxesText(axes) {
 
 function addLayers(){
 	jsLayerList.forEach( function(jsLayer) {
-		console.log(jsLayer);
 		visibleBools.push(false);
 		$("#".concat(jsLayer)).on('click', function() {
 			if (visibleBools[jsLayerList.indexOf(jsLayer)] === false) {
@@ -152,7 +148,6 @@ function addLayers(){
 				// if there is no data in the layer, then loada the layer data
 				if ($.inArray(jsLayer, addedToScene) === -1) {
 					console.log("Loading from PG")
-					//loadLayer(layerName);
 					loadLayer(jsLayer);
 					addedToScene.push(jsLayer);
 				}
