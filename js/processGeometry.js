@@ -8,7 +8,6 @@ function getLayer (layername) {
 				// get the parameters that tell us whether the layer is triangles or not
 				triangleface = jsLayerDetails[layername]["trianglefacename"];
 				var modelType;
-				console.log("77xx2"+JSON.stringify(jsLayerDetails[layername]["trianglefacename"]));
 				if (triangleface !== null && triangleface !== undefined) {
 					modelType = "Triangle";
 				}
@@ -71,8 +70,6 @@ function loadLayer(layername) {
 }
 function loadTINData(aLayer, layerColour, layername){
 						if ((aLayer[0] == "TIN Z") && (aLayer[1] != "")) {
-							//console.log(aLayer[2][1]);
-							//var TINMaterial = new THREE.MeshLambertMaterial( {color: 0x27B030, ambient: 0x27B030} );
 							var modelVertices = []
 							aLayerFormatted = aLayer[1].slice(0, - 5); // Remove final %%%
 							var aLayerArray = aLayerFormatted.split(" %%% ");
@@ -82,7 +79,6 @@ function loadTINData(aLayer, layerColour, layername){
 							aLayerArray.forEach( function(aFeature) {
 
 								tinzGroup = new THREE.Object3D();
-								//console.log((aFeature == ""));
 								var aFeatureArray = aFeature.split(" |||  ||| ");
 
 								aFeatureArray.forEach( function(arrayModel) {
@@ -117,7 +113,6 @@ function loadTINData(aLayer, layerColour, layername){
 											modelGeometry.faces.push( new THREE.Face3( 0, 1, 2 ));
 											modelGeometry.computeFaceNormals();
 											//modelGeometry.computeBoundingBox()
-											//console.log(modelGeometry.boundingBox)
 											material = new THREE.MeshBasicMaterial( { color: layerColour } );
 											var modelMesh = new THREE.Mesh(modelGeometry, material);
 											modelMesh.material.side = THREE.DoubleSide;  //SET DOUBLE SIDED
@@ -134,7 +129,6 @@ function loadTINData(aLayer, layerColour, layername){
 								idname = idname.concat(" ")
 								tinzGroup.name = idname.concat(ids[id].toString());
 								id += 1
-								//console.log("Adding", tinzGroup)
 								scene.add(tinzGroup);
 								sceneobjects.push(tinzGroup);
 							});
@@ -151,9 +145,7 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 			var ids = aLayer[2]
 			var modelVertices = [];
 			var id = 0
-								//console.log( aLayer[1]);
 
-			//console.log(aLayerArray.length, ids.length);
 			aLayerArray.forEach( function(aFeature) {
 				// each one of these is a polyhedral surface representing one geometry
 				polyhedralzGroup = new THREE.Object3D();
@@ -161,12 +153,10 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 				//ranCol = getRandomColor();
 				material = new THREE.MeshBasicMaterial( { color: layerColour } );
 				var aObjectArray = aFeature.split(" ::: ");
-				//console.log(aObjectArray.length);
 
 				aObjectArray.forEach( function(arrayModel) {
 
 					var uniqueCoords = [];
-					//console.log( JSON.stringify(arrayModel) );
 
 					arrayModelSplit = arrayModel.split(",");
 
@@ -175,31 +165,26 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 							modelCoords = modelUnformattedCoords.split(" ");
 							modelVertices.push(modelCoords);
 							uniqueCoords.push(modelUnformattedCoords);
-
-							//console.log(modelCoords);
 							}
-						else { //console.log("Duplicate found: ", modelUnformattedCoords)
+						else {
 						}
 					})
 
-					//console.log(uniqueCoords);
 					var polyholes = [];
 					var triangles;
 					var modelGeometry = new THREE.Geometry();
 					var uniqueVertices = [];
 					var epsilonCheck = [];
-					//console.log(modelVertices.length)
 					//modelVertices.reverse();
 
 					modelVertices.forEach(function(part, index, theVertices) {
-						//console.log(part);
-						if (part.length < 3 && part[0] != "" ) { console.log("Vertex list length is ", part.length, "needs to be three to convertto Three.js vertex", part) }
+						if (part.length < 3 && part[0] != "" ) {
+							console.log("Vertex list length is ", part.length, "needs to be three to convertto Three.js vertex", part) }
 						else {
 							// The triangulator doesn't appear to take into account the fact that some points may share X Y coordinates,
 							// i.e. that there are vertical edges
 							// to overcome this we add an epsilon
 							// so Three.js thinks they're different coordinates
-							//console.log(part);
 							part.forEach(function(coord, i) {
 								if ($.inArray(parseFloat(coord), epsilonCheck) != -1) {
 									part[i] = parseFloat(coord) + EPSILON
@@ -207,7 +192,6 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 							})
 
 							// Change the vertices from str/float to Three.js vertexs
-							//console.log(part);
 
 							// test inverting z and y as scene axes are inverted?
 							theVertices[index] = new THREE.Vector3( parseFloat(part[0]), parseFloat(part[1]) , parseFloat(part[2]) );
@@ -217,7 +201,6 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 						}
 					});
 
-					//console.log(modelVertices);
 					//modelVertices.reverse();
 					modelGeometry.vertices = modelVertices;
 
@@ -231,7 +214,6 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 						var modelMesh = new THREE.Mesh(modelGeometry, material);
 						modelMesh.material.side = THREE.DoubleSide;
 						//modelMesh.geometry.normalsNeedUpdate = true;
-						//console.log(modelMesh.geometry.normalsNeedUpdate);
 
 						polyhedralzGroup.add(modelMesh);
 						sceneobjects.push(modelMesh);
@@ -256,7 +238,6 @@ function loadPolyhedralZData(aLayer,layerColour,layername){
 }
 function loadTinLayer(aLayer, layerColour, layername) {
 	if ((aLayer[0] == "TIN Z") && (aLayer[1] != "")) {
-			//console.log(aLayer[2][1]);
 			//var TINMaterial = new THREE.MeshLambertMaterial( {color: 0x27B030, ambient: 0x27B030} );
 			aLayerFormatted = aLayer[1].slice(0, - 5); // Remove final %%%
 			var aLayerArray = aLayerFormatted.split(" %%% ");
@@ -266,7 +247,6 @@ function loadTinLayer(aLayer, layerColour, layername) {
 			aLayerArray.forEach( function(aFeature) {
 
 				tinzGroup = new THREE.Object3D();
-				//console.log((aFeature == ""));
 				var aFeatureArray = aFeature.split(" |||  ||| ");
 
 				aFeatureArray.forEach( function(arrayModel) {
@@ -301,7 +281,6 @@ function loadTinLayer(aLayer, layerColour, layername) {
 							modelGeometry.faces.push( new THREE.Face3( 0, 1, 2 ));
 							modelGeometry.computeFaceNormals();
 							//modelGeometry.computeBoundingBox()
-							//console.log(modelGeometry.boundingBox)
 							material = new THREE.MeshBasicMaterial( { color: layerColour } );
 							var modelMesh = new THREE.Mesh(modelGeometry, material);
 							modelMesh.material.side = THREE.DoubleSide;  //SET DOUBLE SIDED
@@ -318,7 +297,6 @@ function loadTinLayer(aLayer, layerColour, layername) {
 				idname = idname.concat(" ")
 				tinzGroup.name = idname.concat(ids[id].toString());
 				id += 1
-				//console.log("Adding", tinzGroup)
 				scene.add(tinzGroup);
 				sceneobjects.push(tinzGroup);
 			});
@@ -329,26 +307,20 @@ function loadTinLayer(aLayer, layerColour, layername) {
 
 function loadLineData(aLayer, layerColour, layername) {
 	if ((aLayer[0] == "LINESTRING Z") && (aLayer[1] != "")) {
-			console.log("line");
 			aLayerFormatted = aLayer[1].slice(0, - 5); //  Remove final %%%
 			var aLayerArray = aLayerFormatted.split(" %%% ");
-			console.log(aLayerArray);
 			var id = 0
 			var ids = aLayer[2];
-			console.log(ids)
 
 			ranCol = getRandomColor();
 			var lineMaterial = new THREE.LineBasicMaterial({color: ranCol,  linewidth: 10});
 
 			aLayerArray.forEach( function(aFeature) {
-				console.log("line ".aFeature);
 				var lineGeometry = new THREE.Geometry();
 				aLine = aFeature.split(",");
 				aLine.forEach( function(aLineVertex) {
 					v = aLineVertex.split(" ");
-					console.log("vertices "+aLineVertex);
 					if (v[0] == "") { v.shift() } // Sometimes the first value is "" which causes the lines to fire off into space!
-					console.log(v[0]+" "+v[1]+" "+v[2]);
 					lineGeometry.vertices.push( new THREE.Vector3(parseFloat(v[0]), parseFloat(v[1]), parseFloat(v[2])))
 				});
 
@@ -377,16 +349,11 @@ function loadPointZData(aLayer, layerColour, layername) {
 
 			aLayerArray.forEach( function(aFeature) {
 				aPoint = aFeature.split(" ");
-				//console.log(aPoint)
 				if (aPoint[0] == "") { aPoint.shift() }
-				//console.log(aPoint)
 				point = new THREE.Mesh( pointGeometry = new THREE.SphereGeometry( 3, 12, 12 ),  new THREE.MeshBasicMaterial({color: layerColour, ambient: layerColour})  );
-				//point.applyMatrix( new THREE.Matrix4().makeTranslation(aPoint[0], aPoint[1], aPoint[2]) );
 				point.position = new THREE.Vector3(aPoint[0], aPoint[1], aPoint[2])
-				//console.log(point.position)
 				point.geometry.verticesNeedUpdate = true
 				point.geometry.elementsNeedUpdate = true;
-				//point.geometry.attributes.index.needsUpdate = true
 				idname = layername.replace('"', '')
 				idname = idname.replace('"', '')
 				idname = idname.concat(" ")
@@ -404,12 +371,10 @@ function loadPolygonData(aLayer,layerColour,layername){
 	if (aLayer[1] != "") {
 		aLayerFormatted = aLayer[1].slice(0, - 5); //  Remove final %%%
 		var aLayerArray = aLayerFormatted.split(" %%% ");
-		//console.log(aLayer[0][0], aLayer[0][1]);
 		var ids = aLayer[2]
 		var id = 0
 		var modelVertices = []
 
-		//ranCol = getRandomColor();
 		aLayerArray.forEach( function(aFeature) {
 			aFeature = aFeature.slice(0, - 5); // Remove final :::
 			material = new THREE.MeshBasicMaterial( { color: layerColour } );
@@ -427,7 +392,6 @@ function loadPolygonData(aLayer,layerColour,layername){
 					polygon = arrayModelSplit[0].split(",") // Polygon is the first part, split into series of x y z string
 					arrayModelSplit.shift() // polyholes is the rest
 					polyholes = arrayModelSplit
-					//console.log("Length: ", polyholes.length)
 				}
 
 				if (holesBool === false) {
@@ -443,39 +407,29 @@ function loadPolygonData(aLayer,layerColour,layername){
 						// this doesn't seem to be used?
 						uniqueCoords.push(modelUnformattedCoords);
 
-						//console.log(modelCoords);
 						}
 					else { console.log("Duplicate found: ", modelUnformattedCoords)
 					}
 				})
 
 				//List
-				//console.log(polyholes)
 				if (holesBool === true) {
 					polyholes.forEach( function(polygonHole, polygonHoleIndex, polygonHoles) {
 						splitVertexHole = polygonHole.split(",")
 						splitVertexHole.pop();
-						//console.log(splitVertexHole);
 						splitVertexHole.forEach( function(vertex, vindex){
 							vertexArray = splitVertexHole[vindex].split(" ")
-							//console.log(vertexArray)
 							splitVertexHole[vindex] = new THREE.Vector3( parseFloat(vertexArray[0]), parseFloat(vertexArray[1]), parseFloat(vertexArray[2]) )
-							//console.log(splitVertexHole[vertex]);
 						})
 					polygonHoles[polygonHoleIndex] = splitVertexHole ;
 					});
-					//console.log("holes bro", polyholes)
 				}
 
 				//triangles;
 				modelGeometry = new THREE.Geometry();
 				uniqueVertices = [];
 				epsilonCheck = [];
-				//console.log(modelVertices.length)
-				//modelVertices.reverse();
-				//console.log(holes)
 				modelVertices.forEach(function(part, index, theVertices) {
-				//console.log(part);
 					if (part.length < 3 && part[0] != "" ) { console.log("Vertex list length is ", part.length, "needs to be three to convertto Three.js vertex", part) }
 					else {
 						// The triangulator doesn't appear to take into account the fact that some points may share X Y coordinates, to overcome this we add an epsilon
@@ -493,41 +447,30 @@ function loadPolygonData(aLayer,layerColour,layername){
 						epsilonCheck.push(parseFloat(part[0]), parseFloat(part[1]), parseFloat(part[2]))
 					}
 				});
-				//console.log("xxx");
-				//console.log( JSON.stringify(modelVertices) );
 				modelGeometry.vertices = modelVertices
 
 				// If the list isn't null or less than 3 triangulate it!
 				if (modelVertices != null && modelVertices.length >= 3) {
 					if (polyholes.length != 0) {
-						//console.log("holes", polyholes);
 					}
 
 					triangles = THREE.Shape.Utils.triangulateShape ( modelVertices, polyholes.reverse() );
 					for( var i = 0; i < triangles.length; i++ ){
-						//console.log(triangles[i][0], triangles[i][1], triangles[i][2]);
 						modelGeometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
 					}
-					//console.log("yyy");
-					//console.log( JSON.stringify(modelGeometry.faces) );
-					//console.log("zzz");
 					modelGeometry.verticesNeedUpdate = true
 					modelGeometry.normalsNeedUpdate = true
-					//modelGeometry.computeFaceNormals();
 					try {
 						modelGeometry.computeFaceNormals();
 						var modelMesh = new THREE.Mesh(modelGeometry, material);
 						modelMesh.material.side = THREE.DoubleSide;
 
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + " " + ids[id].toString();
-						//console.log(modelMesh.name);
 						scene.add(modelMesh);
 						sceneobjects.push(modelMesh);
 					}
 					catch(err) {
 						console.log(err)
-						console.log(modelVertices, polyholes, triangles)
-						console.log(modelGeometry)
 					}
 				}
 				modelVertices = [];
@@ -545,7 +488,6 @@ function loadTriangles(aLayer, layerColour, layername) {
 
 	// IN THIS CASE, TREAT THE TRIANGLES AS INDIVIDUAL OBJECTS/MESHES - I.E. ITERATE THROUGH THE FACES
 	// IT IS STILL FASTER THAN STANDARD APPROACH AS NO TRIANGULATION REQUIRED AND NO NEED TO CREATE THE NODES ARRAY
-				//console.log( JSON.stringify(aLayer) );
 				var vertices= aLayer[1];
 				var faces = aLayer[2];
 				//console.log( JSON.stringify(vertices ));
@@ -559,9 +501,6 @@ if (faces != null) {
 				// NB: in this case, the faces are not intelligent but just have the appropropriate
 				// node orders - but no methods e.g. get normal etc
 				faces.forEach(function (face) {
-						console.log( JSON.stringify(face));
-						console.log(face["globalid"]);
-						//console.log(triangles[i][0], triangles[i][1], triangles[i][2]);
 						modelGeometry.faces.push( new THREE.Face3( face["node1"], face["node2"], face["node3"] ));
 				});
 
@@ -573,7 +512,6 @@ if (faces != null) {
 						modelMesh.material.side = THREE.DoubleSide;
 
 						modelMesh.name =  layername.replace('"', '').replace('"', '') + "_trinagles"  // temporary name + ids[id].toString();
-						console.log(modelMesh.name);
 						scene.add(modelMesh);
 						sceneobjects.push(modelMesh);
 /*						scene.children.forEach( function(childLayer) {
@@ -627,9 +565,6 @@ function loadBulkTriangles (aLayer, layerColour,layername){
 								if (childLayer.name.lastIndexOf('test', 0) === 0) {
 									childLayer.traverse( function ( object ) {
 										object.visible = true;
-										console.log(object.geometry.id);
-									console.log(JSON.stringify(object.geometry.faces));
-									console.log(JSON.stringify(object.geometry.vertices));} );
 								}
 							}
 						});*/
@@ -637,8 +572,6 @@ function loadBulkTriangles (aLayer, layerColour,layername){
 					}
 				catch(err) {
 						console.log(err)
-						console.log(modelVertices)
-						console.log(modelGeometry)
 					}
 
 		}

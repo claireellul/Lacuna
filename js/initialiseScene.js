@@ -1,17 +1,11 @@
 var clock;
 function init() {
-	//Selection variables
-	// Create document container
 	container = document.getElementById("container")
 	clock = new THREE.Clock();
 
 	//Create the width and heights using some jQuery magic
 	canvasheight = $( "#container" ).height()
 	canvaswidth = $( "#container" ).width()
-	console.log("Canvas Width: ", canvaswidth)
-	console.log("Canvas Height: ", canvasheight)
-	//CENTROID[0] = 5000;
-	//CENTROID[1] = 5000;
 
 	// Load Stats
 	stats = new Stats();
@@ -50,47 +44,21 @@ function init() {
 
 
 	scene = new THREE.Scene();
-
-	//camera =  new THREE.OrthographicCamera( canvasWidth / - 2, canvasWidth / 2, canvasHeight / 2, canvasHeight / - 2, 1, 1000 );
-	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
-	raycamera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
-	//renderer = new THREE.WebGLRenderer({ antialias: true });
-					renderer = new THREE.CanvasRenderer();
+	camera = new THREE.PerspectiveCamera( 120, canvasWidth/canvasHeight, 1, 10000 );
+	renderer = new THREE.WebGLRenderer({ antialias: true });
+	//renderer = new THREE.CanvasRenderer();
 
 	renderer.setSize( canvasWidth, canvasHeight );
 	container.appendChild( renderer.domElement );
-
-	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-	var cube = new THREE.Mesh( geometry, material );
-	scene.add( cube );
-
-	controls = new THREE.TrackballControls( camera, renderer.domElement );
-	controls.enabled = true;
-	controls.rotateSpeed = 0.6;
-	controls.zoomSpeed = 1.0;
-	controls.panSpeed = 1.0;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.minDistance = 50;
-	controls.maxDistance = 8000;
-	controls.keys = [ 65, 83, 68 ];
-	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
-	controls.addEventListener( 'change', render );
-
-
-
-				//camera.position.set(centroid0-300, centroid1, 500 );
+	controlsTarget = new THREE.Vector3(CENTROID[0]+5,CENTROID[1],0);
+	controlsMode == "TRACKBALL"
+	setupControls("TRACKBALL");
+	interactionMode = "ZOOM";
 
 	camera.position.x = CENTROID[0];
-	camera.position.y = CENTROID[1];
+	camera.position.y = CENTROID[1]-100;
 	camera.position.z = 50;
 
-	raycamera.position.x = CENTROID[0];
-	raycamera.position.y = CENTROID[1];
-	raycamera.position.z = 50;
 
 	// +ve z = out of the screen towards observer's eye
 	// +x = along the screen left/right
@@ -99,40 +67,36 @@ function init() {
 	// green is y
 
 
-				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
-					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
-					object.position.x =  CENTROID[0]-100;
-					object.position.y =  CENTROID[1];
-					object.position.z = 0;
-
-				//	object.scale.x =  200 + 1;
-				//	object.scale.y = 200 + 1;
-				//	object.scale.z = 50 + 1;
-
-
-					scene.add( object );
-					sceneobjects.push( object );
-
+	// include a hidden 3D geometry in the scene
+	// this has been shown to make the ray tracing procedure much more accurate than hidden
+	// 2D planar triangles
+	// NB this is not itself added to the 'sceneobjects' array which contains the visible scene geometry
+	var geometry = new THREE.BoxGeometry( 10000, 10000, 10 );
+		var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+		object.position.x =  CENTROID[0];
+		object.position.y =  CENTROID[1];
+		object.position.z = -10;
+		object.name = "baseGeometry";
+		scene.add( object );
+		sceneobjects.push(object);
 
 
-	axes = new THREE.AxisHelper(400);
+
+
+	axes = new THREE.AxisHelper(200);
 	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
 	axes.position.x = CENTROID[0];
 	axes.position.y = CENTROID[1];
 	axes.position.z = 0;
 	scene.add( axes );
-	console.log("Helper Axes Position : " , axes.position);
 
 	addAxesText(axes);
-	raycaster = new THREE.Raycaster(); // new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
+	raycaster = new THREE.Raycaster();
 
-	//render = function () { requestAnimationFrame( render );
-	//renderer.render(scene, camera);};
 	camera.lookAt( scene.position );
 	animate();
 	addedToScene = []
 	visibleBools = []
-
 	addLayers();
 
 }
@@ -177,7 +141,6 @@ function addAxesText(axes) {
 
 function addLayers(){
 	jsLayerList.forEach( function(jsLayer) {
-		console.log(jsLayer);
 		visibleBools.push(false);
 		$("#".concat(jsLayer)).on('click', function() {
 			if (visibleBools[jsLayerList.indexOf(jsLayer)] === false) {
@@ -185,7 +148,6 @@ function addLayers(){
 				// if there is no data in the layer, then loada the layer data
 				if ($.inArray(jsLayer, addedToScene) === -1) {
 					console.log("Loading from PG")
-					//loadLayer(layerName);
 					loadLayer(jsLayer);
 					addedToScene.push(jsLayer);
 				}

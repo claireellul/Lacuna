@@ -14,7 +14,6 @@
 							changeLayerColour(l)
 						}
 						//renderer.setClearColor( color.toHexString(), 1 )
-						//console.log(color.toHexString())
 					}
 				});
 
@@ -40,10 +39,8 @@
 					// X = ((maxxextent - minxextent) / 2) + minxextent
 					// Y = ((maxyextent - minyextent) / 2) + minyextent
 					// Max X [0] Max Y [1] Min X [2] Min Y[3]
-					console.log(centroid)
 					layerX = ((parseFloat(centroid[0]) - parseFloat(centroid[2])) / 2) + parseFloat(centroid[2])
 					layerY = ((parseFloat(centroid[1]) - parseFloat(centroid[3])) / 2) + parseFloat(centroid[3])
-					console.log(layerX, layerY);
 					lookAtPosition(layerX, layerY, 0)
 				});
 
@@ -72,7 +69,6 @@
 					}
 
 					if ($.inArray(l, addedToScene) != -1 && originalCol === "rgb(8, 8, 8)" ) {
-						console.log(originalCol)
 						scene.children.forEach( function(c) {
 							if (c.hasOwnProperty("name") && c.name.split(" ")[0] === l) {
 								SELECTED.sceneobject.push(c)

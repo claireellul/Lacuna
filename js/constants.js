@@ -1,6 +1,9 @@
 
 // Declare constants
 var sceneobjects = []; // stores all the objects in a scene
+var interactionMode = "ZOOM"; // see setupEvents.js for the full list of interaction modes
+var controlsMode ="TRACKBALL"; // see toolbar.js for the full list of interaction modes
+var controlsTarget = ""; // keeps track of the current target for the interaction controls
 var camera, scene, renderer, controls;
 var raycamera; // a fixed camera to use for ray tracing
 var helper;

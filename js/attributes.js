@@ -24,15 +24,11 @@
 							tables.push(objectParts[0])
 							objectsToGet.push([])
 						}
-							//console.log(tables.indexOf(objectParts[0]));
 						tableNum = tables.indexOf(objectParts[0])
 						objectsToGet[tableNum].push(objectParts[1])
 					}
 				});
 
-				//console.log(tablesAndObjectsToGet)
-				console.log( JSON.stringify(objectsToGet) );
-				console.log( JSON.stringify(tables) );
 				var attributeresponse =
 					$.ajax({
 						  url: './ajax/getattributes.php',
@@ -46,7 +42,6 @@
 						 }).responseJSON;
 
 
-				//console.log(attributeresponse);
 
 				responseToTable(attributeresponse)
 			} //End of get attribute function
@@ -57,13 +52,10 @@
 						//tableToDisplay[1].unshift("Select")
 						// Remove ID, put it back in at the begging
 						temporaryColumns = tableToDisplay[1]
-						//console.log(temporaryColumns);
 						idPos = temporaryColumns.indexOf("ID")
 						temporaryColumns.splice(idPos, 1)
-						//console.log(temporaryColumns)
 						temporaryColumns.unshift("ID")
 						columnNames = temporaryColumns
-						//console.log(columnNames);
 						rows = tableToDisplay[2]
 
 						tableString = tableString.concat("<tr>")
@@ -76,11 +68,7 @@
 							}
 						});
 
-						//console.log(tableString);
 						tableString = tableString.concat("</tr>")
-
-						//tr = new row td = new cell
-						// For each row
 
 						rows.forEach( function(attributeRow) {
 							tableString = tableString.concat("<tr>")
@@ -89,7 +77,6 @@
 									if (colHeader != "geom") {
 										tableString = tableString.concat("<td>")
 										tableString = tableString.concat(attributeRow[colHeader])
-										//console.log(attributeRow[colHeader])
 										tableString = tableString.concat("</td>")
 									}
 								});

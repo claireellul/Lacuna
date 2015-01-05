@@ -12,9 +12,9 @@
 		<!-- <script src="js/three67.js"></script>-->
 		<script src="js/threev69.js"></script>
 		<script src="js/helvetiker_regular.typeface.js"></script>
-		<script src="js/TrackballControlsModified.js"></script>
-		<script src="js/FlyControlsModified.js"></script>
-		<script src="js/FirstPersonControlsModified.js"></script>
+		<script src="js/TrackballControls.js"></script>
+		<script src="js/FlyControls.js"></script>
+		<script src="js/FirstPersonControls.js"></script>
 		<script src="js/Projector.js"></script>
 		<script src="js/CanvasRenderer.js"></script>
 		<script src="js/stats.min.js"></script>

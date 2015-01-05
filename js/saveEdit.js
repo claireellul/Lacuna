@@ -1,5 +1,4 @@
 		function uploadEdits() {
-			console.log(vertexModel)
 			aPoint = (vertexMesh.hasOwnProperty("geometry") && vertexMesh.geometry instanceof THREE.SphereGeometry && vertexMesh.name != "Helper" )
 			aObject3D = ( vertexObject instanceof THREE.Object3D === true  && vertexObject instanceof THREE.Scene === false && vertexMesh instanceof THREE.Line == false )
 			aLine = ( vertexMesh instanceof THREE.Line === true && vertexMesh.parent instanceof THREE.Scene === true  );

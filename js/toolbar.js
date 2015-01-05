@@ -1,34 +1,3 @@
-
-		function deselect() {
-			if (SELECTED.sceneobject.length != 0) {
-				SELECTED.sceneobject.forEach( function(so, selectIndex) {
-					if (so.hasOwnProperty('material')) {
-							so.material.color.set(SELECTED.color[selectIndex])
-							if (so.material.hasOwnProperty('ambient')) {
-								so.material.ambient.set(SELECTED.color[selectIndex])
-							}
-						}
-					else if (so.hasOwnProperty('children')) {
-						so.children.forEach ( function(selectobjectchild) {
-							if (selectobjectchild.hasOwnProperty('material')) {
-								// console.log(SELECTED.color[selectIndex]);
-								selectobjectchild.material.color.set( SELECTED.color[selectIndex] )
-								if (selectobjectchild.material.hasOwnProperty('ambient')) {
-									selectobjectchild.material.ambient.set(SELECTED.color[selectIndex])
-								}
-							}
-						})
-					}
-				});
-				SELECTED.sceneobject = [];
-				SELECTED.color = [];
-				SELECT = false;
-				LASTHIGHLIGHTED = "";
-				$( "#attributesholder" ).empty();
-			}
-		}
-
-
 		$('#topbar').tooltip({ position: { my: "center bottom", at: "right+10 top+5" }, hide: 100, show: 500 });
 		$('.layertext').tooltip({ position: { my: "center bottom", at: "right+10 top+5" }, hide: 100, show: 500 });
 			helperswitch = true;
@@ -46,6 +15,8 @@
 					});
 				});
 			});
+
+
 
 			$('#lookat').click( function() {
 				console.log("Look At clicked")
@@ -73,81 +44,45 @@
 				$('#dialog').dialog('option', 'title', 'Look At');
 			});
 
-
-
-
 			// start of the camera controls options
 			$('#trackball').click( function() {
-				console.log("trackball clicked");
-				console.log(controls.target);
-				var temporaryTarget = controls.target;
-				controls = null;
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.6;
-				controls.zoomSpeed = 1.0;
-				controls.panSpeed = 1.0;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-				controls.minDistance = 50;
-				controls.maxDistance = 8000;
-				controls.keys = [ 65, 83, 68 ];
-				controls.target = temporaryTarget;
-				//controls.addEventListener( 'change', render );
+				controlsMode = "TRACKBALL";
+				interactionMode = "ZOOM";
+				changeInteractionMode(interactionMode);
 			});
 			$('#fly').click( function() {
-				// first get the current camera target
-				console.log(controls.target);
-				var temporaryTarget = controls.target;
-				console.log("fly clicked");
-				controls = null;
-				controls = new THREE.FlyControls(camera,renderer.domElement );
-			   controls.movementSpeed = 25;
-			   controls.rollSpeed = Math.PI/24;
-				controls.minDistance = 50;
-				controls.maxDistance = 8000;
-			   controls.autoForward = false;
-			   controls.target = temporaryTarget;
-			   controls.dragToLook = true;
+				controlsMode = "FLY";
+				interactionMode = "ZOOM";
+				changeInteractionMode(interactionMode);
 			});
 			$('#roll').click( function() {
+				controlsMode = "ROLL";
+				interactionMode = "ZOOM";
 				console.log("roll clicked");
 				alert("Not yet implemented");
 
 			});
 			$('#firstperson').click( function() {
-				console.log("firstperson clicked");
-				var temporaryTarget = controls.target;
-				controls = new THREE.FirstPersonControls(camera);
-				controls.lookSpeed = 0.4;
-				controls.movementSpeed = 20;
-				controls.noFly = false;
-				controls.lookVertical = true;
-				controls.constrainVertical = false;
-//				controls.verticalMin = 1.0;
-//				controls.verticalMax = 2.0;
-				controls.target = temporaryTarget;
-				  if (isFunction(controls.handleEvent)){
-				  } else {
-					  		controls.handleEvent = function ( event ) {
-								if ( typeof this[ event.type ] == 'function' ) {
-									this[ event.type ]( event );
-								}
-						};
-				  }
+				interactionMode = "ZOOM";
+				controlsMode = "FIRSTPERSON";
+				changeInteractionMode(interactionMode);
 			});
 			$('#orbit').click( function() {
+				interactionMode = "ZOOM";
+				controlsMode == "ORBIT";
 				alert("Not yet implemented");
 				console.log("orbit clicked");
 			});
 			$('#path').click( function() {
+				interactionMode = "ZOOM";
+				controlsMode == "PATH";
 				alert("Not yet implemented");
 				console.log("path clicked");
 			});
 
+			// CHANGE THE position of the axes
+			// this doesn't need to change the click interaction mode with the screen
 			$('#axispos').click( function() {
-				console.log("Look At clicked")
 				$("#dialogtext").html('<form> X Position: <br> <input type="text" id="xcoordinate"><br> Y Position: <br> <input type="text" id="ycoordinate"><br> Z Position:<br>  <input type="text" id="zcoordinate"></form>' )
 				$("#xcoordinate").val(axes.position.x)
 				$("#ycoordinate").val(axes.position.y)
@@ -174,6 +109,9 @@
 				$('#dialog').dialog('option', 'title', 'Reposition Axis');
 			});
 
+
+			// change the size of the axis
+			// this doesn't need to change the click interaction mode with the screen
 			$('#axissize').click( function() {
 				console.log("Axis size clicked")
 				$("#dialogtext").html('<form> Axis Size: <br> <input type="text" id="asize"><br>' )
@@ -203,6 +141,8 @@
 				$('#dialog').dialog('option', 'title', 'Resize Axis');
 			});
 
+			// change the helper colour
+			// this doesn't need to change the click interaction mode with the screen
 			$("#helpercolour").spectrum({
 				color: "#FF0000",
 				containerClassName: 'colourpicker',
@@ -216,6 +156,8 @@
 				}
 			});
 
+			// change the canvas colour
+			// this doesn't need to change the click interaction mode with the screen
 			$("#canvascolour").spectrum({
 				color: "#262626",
 				containerClassName: 'colourpicker',
@@ -226,13 +168,15 @@
 				}
 			});
 
+
+			// swith the helper triangle on or off
+			// this doesn't need to change the click interaction mode with the screen
 			$('#helpertoggle').click( function() {
 				if (helperswitch == true) {
 					helperswitch = false;
 					$('#helpertoggle').text("OFF");
 					if (helper != null) {
 						console.log(helper.visible);
-
 						if (helper.visible == true) {
 							console.log("Disabling helper");
 							helper.visible = false
@@ -251,6 +195,8 @@
 				}
 			});
 
+			// switch the axis on or off
+			// this doesn't need to change the click interaction mode with the screen
 			$('#axistoggle').click( function() {
 				if (axistoggle == true) {
 					axistoggle = false;
@@ -313,6 +259,11 @@
 
 
 			$('#singleselect').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				if (singleselect === false) {
 					if (multiselect === true) {
 						MULTISELECT = false;
@@ -340,6 +291,11 @@
 
 
 			$('#multiselect').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				if (singleselect === true) {
 					SELECT = false;
 					singleselect = false;
@@ -366,6 +322,11 @@
 
 			var clickdistance = false
 			$('#clickdistance').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				if ((clickdistance === false) && (ACTION === false)) {
 					$('#mode').text("Current Pointer Mode: Measurement");
 					$('#clickdistanceimage').attr("src", "imgs/clickdistanceenabled.png");
@@ -387,6 +348,11 @@
 
 			var area = false
 			$('#area').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				if ((area == false ) && (ACTION === false)) {
 					$('#mode').text("Current Pointer Mode: Measurement");
 					$('#areaimage').attr("src", "imgs/areaenabled.png");
@@ -408,6 +374,11 @@
 
 
 			$('#delete').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("Delete clicked");
 				if ((ACTION === false) && ((SELECT) || (MULTISELECT)) && (SELECTED.sceneobject.length != 0)) {
 					$("#dialogtext").text("Are you sure you want to delete selected objects?");
@@ -432,6 +403,11 @@
 			});
 
 			$('#translate').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("Translate clicked");
 				if ((ACTION === false) && ((SELECT) || (MULTISELECT)) && (SELECTED.sceneobject.length != 0)) {
 					$("#dialogtext").html('<form> X Translation: <input type="text" id="xtranslation"><br> Y Translation: <input type="text" id="ytranslation"><br> Z Translation: <input type="text" id="ztranslation"></form>' )
@@ -459,6 +435,11 @@
 			});
 
 			$('#copy').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("Copy clicked");
 				if ((ACTION === false) && ((SELECT) || (MULTISELECT)) && (SELECTED.sceneobject.length === 1)) {
 					$("#dialogtext").html('<form> X Copy Location: <input type="text" id="xcoordinate"><br> Y Copy Location: <input type="text" id="ycoordinate"><br> Z Copy Location: <input type="text" id="zcoordinate"></form>' )
@@ -486,6 +467,11 @@
 			});
 
 			$('#rotate').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("rotate clicked");
 				if ((ACTION === false) && ((SELECT) || (MULTISELECT)) && (SELECTED.sceneobject.length != 0)) {
 					var rotateAxis = ""
@@ -514,7 +500,14 @@
 				}
 			});
 
+			// rescale the select object
+			// this changes the screen interaction mode
 			$('#scale').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("Scale clicked");
 				if ((ACTION === false) && ((SELECT) || (MULTISELECT)) && (SELECTED.sceneobject.length != 0)) {
 					$("#dialogtext").html('<form> X Scale: <br>  <input type="text" id="xscale"><br> Y Scale: <br>  <input type="text" id="yscale"><br> Z Scale: <br> <input type="text" id="zscale"></form>' )
@@ -544,6 +537,11 @@
 			});
 
 			$('#sphere').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log("Sphere clicked");
 				if (ACTION === false) {
 					BUFFER = true;
@@ -576,6 +574,11 @@
 
 			$('#cylinder').click( function() {
 				console.log("Sphere clicked");
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				BUFFER = true;
 				if (ACTION === false) {
 					$("#dialogtext").html('<form> Top Radius (m): <br>  <input type="text" id="cylindertopradius"> <br> Bottom Radius: <br>  <input type="text" id="cylinderbotradius"><br> Height: <br> <input type="text" id="cylinderheight"> <br> Opacity (0-1): <br>  <input type="text" id="cylinderopacity"> <br> X Coordinate: <br> <input type="text" id="xcoordinate"><br> Y Coordinate: <br>  <input type="text" id="ycoordinate"><br> Z Coordinate: <br>  <input type="text" id="zcoordinate"></form>' )
@@ -609,6 +612,11 @@
 
 			$('#box').click( function() {
 				console.log("Box buffer clicked");
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				BUFFER = true;
 				if (ACTION === false) {
 					$("#dialogtext").html('<form> Box Width (m):<br> <input type="text" id="boxwidth"> <br> Box Height (m): <br> <input type="text" id="boxheight"><br> Box Depth (m): <br><input type="text" id="boxdepth"> <br> Opacity (0-1): <br><input type="text" id="boxopacity"> <br> X Coordinate:<br> <input type="text" id="xcoordinate"><br> Y Coordinate: <br><input type="text" id="ycoordinate"><br> Z Coordinate:<br> <input type="text" id="zcoordinate"><br></form>' )
@@ -643,6 +651,11 @@
 
 
 			$('#vertexedit').click( function() {
+				if (interactionMode == "ZOOM") {
+						// SETUP THE OTHER EVENT HANDLERS AND CANCEL THE ZOOM FUNCTION
+						interactionMode = "NOTZOOM";
+						changeInteractionMode(interactionMode);
+				}
 				console.log(VERTEX, ACTION, GEOMCLICKED)
 				if (VERTEX == false && ACTION == false) {
 					$('#verteximage').attr("src", "imgs/vertexedit.png");
@@ -691,6 +704,3 @@
 				 }
 			});
 
-function isFunction(func){
-    if(typeof func == 'function') return true;
-}

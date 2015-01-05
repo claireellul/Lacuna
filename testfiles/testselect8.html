@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - Working select with geometry instead of 'box' object</title>
+		<title>three.js canvas - Get a point whereever the user clicks, on the 2D 	</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -49,7 +49,8 @@
 			var raycaster;
 
 			var objects = [];
-var container = document.getElementById('container');
+			var baseobjects = [];
+			var container = document.getElementById('container');
 			init();
 			animate();
 			render();
@@ -83,13 +84,13 @@ var container = document.getElementById('container');
 				console.log("width is "+width);
 
 				camera = new THREE.PerspectiveCamera( 70, width/window.innerHeight, 1, 10000 );
-				camera.position.set(centroid0-300, centroid1, 500 );
+				camera.position.set(centroid0, centroid1, 500 );
 
 				scene = new THREE.Scene();
 
     				var PI2 = Math.PI * 2;
 
-    particleMaterial = new THREE.SpriteCanvasMaterial( {
+    /*particleMaterial = new THREE.SpriteCanvasMaterial( {
 
         color: 0xff0000,
         program: function ( context ) {
@@ -101,7 +102,7 @@ var container = document.getElementById('container');
         }
 
     } );
-
+*/
 	//renderer = new THREE.WebGLRenderer({ antialias: true });
 //					renderer = new THREE.CanvasRenderer();
 
@@ -169,8 +170,8 @@ var container = document.getElementById('container');
 				var modelGeometry = new THREE.Geometry();
 				var theVertices=[];
 				theVertices.push(new THREE.Vector3( centroid0, centroid1 , 0));
-				theVertices.push(new THREE.Vector3( centroid0-500, centroid1 , 50));
-				theVertices.push(new THREE.Vector3( centroid0-500, centroid1-100 , 50));
+				theVertices.push(new THREE.Vector3( centroid0-500, centroid1 , 0));
+				theVertices.push(new THREE.Vector3( centroid0-500, centroid1-100 , 0));
 				modelGeometry.vertices = theVertices;
 				modelGeometry.faces.push(new THREE.Face3(0,1,2));
 				var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } );
@@ -181,6 +182,35 @@ var container = document.getElementById('container');
 				objects.push(modelMesh);
 
 
+				// add two fake very large triangles as a base plane
+				// also useful for intersection calculations
+				modelGeometry = new THREE.Geometry();
+				theVertices=[];
+				theVertices.push(new THREE.Vector3( centroid0-1000, centroid1-1000 , 0));
+				theVertices.push(new THREE.Vector3( centroid0+1000, centroid1+1000 , 0));
+				theVertices.push(new THREE.Vector3( centroid0-1000, centroid1+1000 , 0));
+				modelGeometry.vertices = theVertices;
+				modelGeometry.faces.push(new THREE.Face3(0,1,2));
+				material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } );
+				modelMesh = new THREE.Mesh(modelGeometry, material);
+				modelMesh.material.side = THREE.DoubleSide;
+				modelMesh.name =  "triangle1";
+				scene.add(modelMesh);
+				baseobjects.push(modelMesh);
+
+				modelGeometry = new THREE.Geometry();
+				theVertices=[];
+				theVertices.push(new THREE.Vector3( centroid0-1000, centroid1-1000 , 0));
+				theVertices.push(new THREE.Vector3( centroid0+1000, centroid1+1000 , 0));
+				theVertices.push(new THREE.Vector3( centroid0+1000, centroid1-1000 , 0));
+				modelGeometry.vertices = theVertices;
+				modelGeometry.faces.push(new THREE.Face3(0,1,2));
+				material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } );
+				modelMesh = new THREE.Mesh(modelGeometry, material);
+				modelMesh.material.side = THREE.DoubleSide;
+				modelMesh.name =  "triangle1";
+				scene.add(modelMesh);
+				baseobjects.push(modelMesh);
 
 	axes = new THREE.AxisHelper(400);
 	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
@@ -257,115 +287,31 @@ function drawRayLine(rayCaster,width)
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
-
-				var vector = new THREE.Vector3();
-/*				console.log(width);
-				width = window.innerWidth - 300;
-				height = window.innerHeight - 100;
-				console.log("event x" +event.clientX);
-				console.log("event x - 300" +(event.clientX-300));
-				console.log("full value" +event.clientX/window.innerWidth);
-				console.log("partial value" +(event.clientX-300)/width);
-				parval = (event.clientX-300)/width * 2 -1;
-				console.log("partial value normalised: " +parval);
-				var test1 = (event.clientX - 300)/event.clientX;
-				var test2 = width/window.innerWidth;
-				scalefactor = test1/test2;
-				parval = (event.clientX-300)*scalefactor/width * 2 -1;
-				console.log("partial value scale factor normalised" +parval);
-				console.log("scale factor" +(test1/test2));
-				vector.set( ( event.clientX - (300) )/width * 2 - 1, - ( event.clientY-100 /height ) * 2 + 1, 0.5 );
-				console.log((event.clientX/width) * 2 - 1);
-				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
-				vector.unproject( camera );
-				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
-
-				// subtract the mouse vector from the camera vector
-				// create a unit vector using 'normalise'
-				// create a ray using the camera and this unit vector
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
-				 //drawRayLine(raycaster,width);
-				 render();
-				  //requestAnimationFrame( animate );
-				console.log(objects[0].geometry);
-				var intersects = raycaster.intersectObjects( objects );
-*/
-
-				console.log("original x and y clicked" + "  "+event.clientX + " " +event.clientY );
-				var vector = new THREE.Vector3();
-
-				// with a %width div
-				//var offset = window.innerWidth * 0.26;
-				//var width=window.innerWidth * 0.74;
-				//var top = document.getElementById('topbar').clientHeight;
-				//var height = document.getElementById('container').clientHeight;
-
-
-
-				// with a fixed position div
-				var offset = 350;//document.getElementById('container').style.left;
-				//var width = window.innerWidth - offset;
-				var top = 47 ; //document.getElementById('container').style.top;
-				//var height = window.innerHeight - top; //document.getElementById('container').clientHeight;
-				var height = document.getElementById('container').clientHeight;
-				var width = document.getElementById('container').clientWidth-20;
-
-				console.log(offset + "  height "+height + " top " +top + " width " +width);
-				vector.set( ( event.clientX - (offset) )/width * 2 - 1, - ( (event.clientY-top) / height ) * 2 + 1, 0);
-				var partialY = -((event.clientY - top)/height) * 2 + 1;
-				console.log("partial value Y " + partialY);
-				var partialX = (event.clientX-offset)/width*2 -1;
-				console.log("partial value X" +partialX);
-				console.log (" x y z vector " + vector.x + " " + vector.y + " " + vector.z);
-				console.log("camera position " + camera.position.x +" " + camera.position.y + " "+camera.position.z);
-				vector.unproject( camera );
-				console.log (" x y z vector unproject " + vector.x + " " + vector.y + " " + vector.z);
-
-				// subtract the mouse vector from the camera vector
-				// create a unit vector using 'normalise'
-				// create a ray using the camera and this unit vector
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
-				 //drawRayLine(raycaster,width);
-				 render();
-				  //requestAnimationFrame( animate );
-				console.log(objects[0].geometry);
-				var intersects = raycaster.intersectObjects( objects );
-
-				if ( intersects.length > 0 ) {
-					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-					var particle = new THREE.Sprite( particleMaterial );
-					particle.position.copy( intersects[ 0 ].point );
-					particle.scale.x = particle.scale.y = 16;
-					scene.add( particle );
-				 //drawLine(camera.position,intersects[ 0 ].point,  "0xff0000");
-				 drawRayLine(raycaster,width);
-
-				} else {
-//					var particle = new THREE.Sprite( particleMaterial );
-//					particle.position.copy( vector.unproject(camera));
-//					particle.scale.x = particle.scale.y = 16;
-//					scene.add( particle );
+				var vector = rescaleAndCentre(event.clientX,event.clientY);
+				var intersection = calculateIntersection(camera,vector, true, true, objects);
+				if (!intersection) {
+					// didnt intersect anything so draw a fake 0,0 plane very large and do intersection with that?
+					/*var geometry = new THREE.PlaneGeometry( scene.position.x,scene.position.y,500,500 );
+					var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+					var plane = new THREE.Mesh( geometry, material ); scene.add( plane );
+					var planes = [];
+					planes.push(plane);
+					var vector = rescaleAndCentre(event.clientX,event.clientY);
+					var intersection = calculateIntersection(camera,vector, true, true, planes);
+					*/
+					// use the two fake triangles to find the intersection point with the 2d world
+					var intersection = calculateIntersection(camera,vector, true, true, baseobjects);
+					console.log(intersection[0]);
+					console.log(intersection[0]["point"]);
 
 				}
-
-				/*
-				// Parse all the faces
-				for ( var i in intersects ) {
-
-					intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
-
-				}
-				*/
 			}
-
-			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 				render();
-//				stats.update();
-
+				//stats.update();
 			}
 
 			var radius = 600;
@@ -407,6 +353,70 @@ function drawLine(pointA, pointB, lineColor)
         console.debug(pointA.x.toString() + ':' + pointA.y.toString() + ':' + pointA.z.toString()  + ':' +
                     pointB.x.toString() + ':' + pointB.y.toString()  + ':' + pointB.z.toString());
     }
+}
+function calculateIntersection(camera,vector,changeColour,drawPoint, intersectObjects){
+	// take the screen click vector which has been rescaled so that the value of x and y is between -1 and + 1
+	// and that 0,0 is in the middle and axes are pointing in three.js directions not screen direction
+	// convert it to a real world point close to the camera
+	// draw a ray from the camera through this point to the geometetry in the scene
+	// intersect the ray with the geometry
+	// optionally, change the colour of the geometry and draw the intersection point
+	// return the array of intersected objects for further processing - e.g. get attributes, info etc.
+
+					vector.unproject( camera );
+					// nb: the ray caster is set to intersect ANY object in the ray not just the first
+					raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize(),true );
+					var intersects = raycaster.intersectObjects( intersectObjects );
+					if ( intersects.length > 0 ) {
+						if (drawPoint===true) {
+								var PI2 = Math.PI * 2;
+								var    particleMaterial = new THREE.SpriteCanvasMaterial( {
+						        color: 0xff0000,
+						        program: function ( context ) {
+						            context.beginPath();
+						            context.arc( 0, 0, 0.5, 0, PI2, true );
+						            context.fill();
+								}
+							 	} );
+								var particle = new THREE.Sprite( particleMaterial );
+								particle.position.copy( intersects[ 0 ].point );
+								particle.scale.x = particle.scale.y = 10;
+								scene.add( particle );
+						}
+						if (changeColour===true) {
+							var colour =  Math.random() * 0xffffff;
+							for (i = 0;i < intersects.length; i ++) {
+								intersects[ i ].object.material.color.setHex(colour );
+							}
+						}
+						return intersects;
+					}
+}
+
+function rescaleAndCentre(screenPointX, screenPointY){
+
+	// screen coords are 2d and have +y running top to bottom with the origin at top left
+	// threejs coords are 3d, have +y running bottom to top, with the origin at the centre
+	// this function rescales and shifts the mouse click event into threejs coords
+	// with resulting x and y values from -1 to + 1
+
+	// NB:  this function needs a FIXED POSITION div to work, which must have hard coded top and left values
+	// setting teh DIV size for the canvas using %width or %height fails
+
+	// with a fixed position div
+	var offset = 350; //document.getElementById('container').style.left;
+	var top = 47; //document.getElementById('container').style.top;
+	var height = document.getElementById('container').offsetHeight;
+
+	// use a small shrinkage factor as this seems to improve click accuracy?
+	var width = document.getElementById('container').clientWidth-20;
+
+	var partialY = -((screenPointY - top)/height) * 2 + 1;
+	var partialX = (screenPointX-offset)/width*2 -1;
+	console.log("Partial X and Y "+partialX + " "+partialY);
+	var vector = new THREE.Vector3();
+	vector.set( partialX, partialY, 0.5 );
+	return vector;
 }
 
 		</script>
