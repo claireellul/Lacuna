@@ -111,6 +111,14 @@ function setupEvents(){
 					}
 				});
 			$(document).on('keyup', function(e) {
+
+				// if the escape key is pressed, then cancel all functionality and go back to zoom mode
+				if(e.keyCode == 27){
+					console.log("escape pressed");
+					interactionMode = "ZOOM";
+					changeInteractionMode(interactionMode);
+				}
+
 				console.log("document keyup");
 				console.log("keyup "+SELECT + " " + MULTISELECT + " "+select);
 				if (MULTISELECT === true) {
@@ -135,11 +143,6 @@ function setupEvents(){
 				var code = e.keyCode || e.which;
 				//console.log(code);
 
-				// if the escale key is pressed, then cancel all functionality and go back to zoom mode
-				if(e.which == 27){
-					interactionMode = "ZOOM";
-					changeInteractionMode(interactionMode);
-				}
 
 
 				keyIsM = ((String.fromCharCode(code) == "m") ||  (String.fromCharCode(code) == "M" ))
@@ -256,6 +259,10 @@ function changeInteractionMode(newMode) {
 			// disable the other events on the canvas
 			cancelEvents();
 
+			// clear any marquee
+			marquee.fadeOut();
+
+			console.log("zoom mode is "+ controlsMode);
 			// create the required zoom/pan controls depending on the last used interaction mode
 			setupControls(controlsMode);
 	}

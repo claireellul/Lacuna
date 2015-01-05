@@ -1,4 +1,3 @@
-		//function is_inside_marquee(vector) {
 			function is_inside_marquee(geomvector) {
 
 // can take advantage of Version 69's unproject function which returns the real world coords of the marquee

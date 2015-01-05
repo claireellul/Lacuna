@@ -7,14 +7,23 @@ function calculateIntersection(camera,vector,changeColour,drawPoint, intersectOb
 	// optionally, change the colour of the geometry and draw the intersection point
 	// return the array of intersected objects for further processing - e.g. get attributes, info etc.
 
+
 					vector.unproject( camera );
 					// nb: the ray caster is set to intersect ANY object in the ray not just the first
-					raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize(),true );
+
+
+					// use this for perspectivecamera
+					var rayvector = vector.sub( camera.position ).normalize()
+					raycaster.ray.set( camera.position, rayvector,true );
+
+
+
+
 					var intersects = raycaster.intersectObjects( intersectObjects );
 					if ( intersects.length > 0 ) {
 						if (drawPoint===true) {
 								var point = new THREE.Mesh( pointGeometry =
-								new THREE.SphereGeometry( 0.5, 0.5, 0.5 ),  new THREE.MeshBasicMaterial({color: "0xffffff"})  );
+								new THREE.SphereGeometry( 1, 1, 1 ),  new THREE.MeshBasicMaterial({color: "0xffffff"})  );
 								point.position.copy( intersects[ 0 ].point );
 								scene.add(point);
 						}
@@ -43,8 +52,9 @@ function rescaleAndCentre(screenPointX, screenPointY){
 	var top = 47; //document.getElementById('container').style.top;
 	var height = document.getElementById('container').offsetHeight;
 
+
 	// use a small shrinkage factor as this seems to improve click accuracy?
-	var width = document.getElementById('container').clientWidth-20;
+	var width = document.getElementById('container').clientWidth;
 
 	var partialY = -((screenPointY - top)/height) * 2 + 1;
 	var partialX = (screenPointX-offset)/width*2 -1;
@@ -58,50 +68,42 @@ function make_multi_selection() {
 
 	// idea for multi-select
 	// take the marquee boundaries
-	// find out where they intersect the 2D surface of the world by creating a 'fake' geometry
+	// find out where they intersect the 2D surface of the world by using the fake base geometry
 	// use this as the MBR
-	// same method can be used for dynamic data retrieval
+
+	var marqueeTop = marquee.position().top;
+	var marqueeLeft = marquee.position().left;
+	var marqueeBottom = marquee.position().top + marquee.height();
+	var marqueeRight = marquee.position().left + marquee.width();
+
+	// a temporary array for the base object
+	var baseArray = [];
+	baseArray.push(scene.getObjectByName( "baseGeometry" ));
+	console.log(baseArray[0]);
+	console.log("marquee values top left bottom right "+marqueeTop + " "+marqueeLeft + " "+marqueeBottom + " "+marqueeRight);
+
+	// get the intersection vector with the base geometry only to get the 2D MBR
+	var vector = rescaleAndCentre(marqueeLeft,marqueeTop);
+	var intersection1 = calculateIntersection(camera,vector, false, false, baseArray);
+	console.log(intersection1[0].point);
+
+	// get the intersection vector with the base geometry only to get the 2D MBR
+	var vector = rescaleAndCentre(marqueeLeft,marqueeBottom);
+	var intersection2 = calculateIntersection(camera,vector, false, false, baseArray);
+	console.log(intersection2[0].point);
+
+	var vector = rescaleAndCentre(marqueeRight,marqueeTop);
+	var intersection3 = calculateIntersection(camera,vector, false, false, baseArray);
+	console.log(intersection3[0].point);
+
+	var vector = rescaleAndCentre( marqueeRight,marqueeBottom);
+	var intersection4 = calculateIntersection(camera,vector, false, false, baseArray);
+	console.log(intersection4[0].point);
+
 	// then project the 3D scene data into 2D
 	// and calculate teh intersection
-	// use vector maths for the 'fake' geometry - take the line, and calculate the intersection point with z = 0 plane;
-
-	// or use PROJECT ON PLANE functionality provided by three.js?
-
-		scene.children.forEach( function(o) {
-			isMesh = (o instanceof THREE.Mesh);
-			isObject3D = (o instanceof THREE.Object3D);
-			isLine = (o instanceof THREE.Line);
-			isAxis = (o instanceof THREE.AxisHelper);
-			isHelper = ((o.hasOwnProperty('name')) && (o.name === "Helper"));
-			console.log(o.type+ " "+isMesh + " " +isObject3D + " "+isLine + " "+isAxis + " " +isHelper);
-			oGeom = o.geometry;
-			var minx= 99999999; var miny= 99999999; var maxx = 0; var maxy = 0;
-//			console.log("00000000000000000000000000 " + oGeom.vertices[0].x);
-			if ((isMesh || isLine) && ((isHelper === false) && (isAxis === false))) {
-					// go through vertex by vertex
-					for (i = 0; i < oGeom.vertices.length; i++) {
-						v = o.geometry.vertices[i]
-						console.log(v);
-						vector = new THREE.Vector3( v.x, v.y,0)
-						if (minx > v.x) {minx = v.x;}
-						if (miny > v.y) {miny = v.y;}
-						if (maxy < v.y) {maxy = v.y;}
-						if (maxx < v.x) {maxx = v.x;}
-						if ((is_inside_marquee(vector)) && (SELECTED.sceneobject.indexOf(o) === -1 )) {
-							// add to the highlighed objects
-									SELECTED.sceneobject.push(o);
-									SELECTED.color.push(o.material.color.clone());
-									o.material.color.setHex( 0xCCCCCC );
-									if (o.material.hasOwnProperty("ambient")) {
-										o.material.ambient.setHex ( 0xCCCCCC );
-									}
-						}
-					}
-					console.log(minx + "  "+ miny + "  "+maxx + " " +maxy);
-			}
 
 
-		});
 }
 
 
@@ -224,3 +226,43 @@ function isFunction(func){
 			});
 
 			*/
+
+/*
+
+
+		scene.children.forEach( function(o) {
+			isMesh = (o instanceof THREE.Mesh);
+			isObject3D = (o instanceof THREE.Object3D);
+			isLine = (o instanceof THREE.Line);
+			isAxis = (o instanceof THREE.AxisHelper);
+			isHelper = ((o.hasOwnProperty('name')) && (o.name === "Helper"));
+			console.log(o.type+ " "+isMesh + " " +isObject3D + " "+isLine + " "+isAxis + " " +isHelper);
+			oGeom = o.geometry;
+			var minx= 99999999; var miny= 99999999; var maxx = 0; var maxy = 0;
+//			console.log("00000000000000000000000000 " + oGeom.vertices[0].x);
+			if ((isMesh || isLine) && ((isHelper === false) && (isAxis === false))) {
+					// go through vertex by vertex
+					for (i = 0; i < oGeom.vertices.length; i++) {
+						v = o.geometry.vertices[i]
+						console.log(v);
+						vector = new THREE.Vector3( v.x, v.y,0)
+						if (minx > v.x) {minx = v.x;}
+						if (miny > v.y) {miny = v.y;}
+						if (maxy < v.y) {maxy = v.y;}
+						if (maxx < v.x) {maxx = v.x;}
+						if ((is_inside_marquee(vector)) && (SELECTED.sceneobject.indexOf(o) === -1 )) {
+							// add to the highlighed objects
+									SELECTED.sceneobject.push(o);
+									SELECTED.color.push(o.material.color.clone());
+									o.material.color.setHex( 0xCCCCCC );
+									if (o.material.hasOwnProperty("ambient")) {
+										o.material.ambient.setHex ( 0xCCCCCC );
+									}
+						}
+					}
+					console.log(minx + "  "+ miny + "  "+maxx + " " +maxy);
+			}
+
+
+		});
+*/

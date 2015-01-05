@@ -1,7 +1,5 @@
 var clock;
 function init() {
-	//Selection variables
-	// Create document container
 	container = document.getElementById("container")
 	clock = new THREE.Clock();
 
@@ -10,8 +8,6 @@ function init() {
 	canvaswidth = $( "#container" ).width()
 	console.log("Canvas Width: ", canvaswidth)
 	console.log("Canvas Height: ", canvasheight)
-	//CENTROID[0] = 5000;
-	//CENTROID[1] = 5000;
 
 	// Load Stats
 	stats = new Stats();
@@ -50,11 +46,7 @@ function init() {
 
 
 	scene = new THREE.Scene();
-
-	//camera =  new THREE.OrthographicCamera( canvasWidth / - 16, canvasWidth / 16, canvasHeight / 16, canvasHeight / - 16, -200, 10000 );
-	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.01, 10000 );
-
-	raycamera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	camera = new THREE.PerspectiveCamera( 120, canvasWidth/canvasHeight, 1, 10000 );
 	renderer = new THREE.WebGLRenderer({ antialias: true });
 	//renderer = new THREE.CanvasRenderer();
 
@@ -65,22 +57,10 @@ function init() {
 	setupControls("TRACKBALL");
 	interactionMode = "ZOOM";
 
-	// rotate teh camera to GIS coordinates
-	//camera.up = new THREE.Vector3(-1,-1,-1);
-	//camera.up.set( 0, 0, 1 );
 	camera.position.x = CENTROID[0];
 	camera.position.y = CENTROID[1]-100;
 	camera.position.z = 50;
 
-	//camera.position.x = CENTROID[0];
-	//camera.position.y = CENTROID[1];
-	//camera.position.z = 500;
-
-	//camera.lookAt(CENTROID[0],CENTROID[1],500);
-
-	raycamera.position.x = CENTROID[0];
-	raycamera.position.y = CENTROID[1];
-	raycamera.position.z = 50;
 
 	// +ve z = out of the screen towards observer's eye
 	// +x = along the screen left/right
@@ -89,24 +69,19 @@ function init() {
 	// green is y
 
 
-	var geometry = new THREE.BoxGeometry( 40, 40, 40 );
+	// include a hidden 3D geometry in the scene
+	// this has been shown to make the ray tracing procedure much more accurate than hidden
+	// 2D planar triangles
+	// NB this is not itself added to the 'sceneobjects' array which contains the visible scene geometry
+	var geometry = new THREE.BoxGeometry( 10000, 10000, 10 );
 		var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
 		object.position.x =  CENTROID[0];
 		object.position.y =  CENTROID[1];
-		object.position.z = 100;
-
+		object.position.z = -10;
+		object.name = "baseGeometry";
 		scene.add( object );
-		sceneobjects.push( object );
+		sceneobjects.push(object);
 
-
-	var geometry = new THREE.BoxGeometry( 10, 10, 10 );
-		var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
-		object.position.x =  CENTROID[0];
-		object.position.y =  CENTROID[1];
-		object.position.z = 0;
-
-		scene.add( object );
-		sceneobjects.push( object );
 
 
 
@@ -119,10 +94,8 @@ function init() {
 	console.log("Helper Axes Position : " , axes.position);
 
 	addAxesText(axes);
-	raycaster = new THREE.Raycaster(); // new THREE.Vector3(), new THREE.Vector3( CENTROID[0], CENTROID[1], 20 ), 0, 10 );
+	raycaster = new THREE.Raycaster();
 
-	//render = function () { requestAnimationFrame( render );
-	//renderer.render(scene, camera);};
 	camera.lookAt( scene.position );
 	animate();
 	addedToScene = []

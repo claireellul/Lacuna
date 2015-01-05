@@ -177,7 +177,6 @@
 					$('#helpertoggle').text("OFF");
 					if (helper != null) {
 						console.log(helper.visible);
-
 						if (helper.visible == true) {
 							console.log("Disabling helper");
 							helper.visible = false
