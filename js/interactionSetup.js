@@ -17,14 +17,15 @@
 
 			}
 	function render() {
-//		requestAnimationFrame( render );
 		renderer.render(scene, camera);
 	}
 
 			function animate() {
 				requestAnimationFrame( animate );
 				var delta = clock.getDelta();
-				controls.update(1);
+				if (controls) {
+					controls.update(delta);
+				}
 				stats.update();
 				render();
 

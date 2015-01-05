@@ -22,7 +22,7 @@ $.ajax({
 }).done(function() {
 			init();
 			animate();
-			setupEvents();
+//			setupEvents();
 	}); // end of initial setup script
 
 	var intersectedObject = ""

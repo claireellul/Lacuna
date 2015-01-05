@@ -13,19 +13,10 @@ function calculateIntersection(camera,vector,changeColour,drawPoint, intersectOb
 					var intersects = raycaster.intersectObjects( intersectObjects );
 					if ( intersects.length > 0 ) {
 						if (drawPoint===true) {
-								var PI2 = Math.PI * 2;
-								var    particleMaterial = new THREE.SpriteCanvasMaterial( {
-						        color: 0xff0000,
-						        program: function ( context ) {
-						            context.beginPath();
-						            context.arc( 0, 0, 0.5, 0, PI2, true );
-						            context.fill();
-								}
-							 	} );
-								var particle = new THREE.Sprite( particleMaterial );
-								particle.position.copy( intersects[ 0 ].point );
-								particle.scale.x = particle.scale.y = 1;
-								scene.add( particle );
+								var point = new THREE.Mesh( pointGeometry =
+								new THREE.SphereGeometry( 0.5, 0.5, 0.5 ),  new THREE.MeshBasicMaterial({color: "0xffffff"})  );
+								point.position.copy( intersects[ 0 ].point );
+								scene.add(point);
 						}
 						if (changeColour===true) {
 							var colour =  Math.random() * 0xffffff;
@@ -111,6 +102,39 @@ function make_multi_selection() {
 
 
 		});
+}
+
+
+		function deselect() {
+			if (SELECTED.sceneobject.length != 0) {
+				SELECTED.sceneobject.forEach( function(so, selectIndex) {
+					if (so.hasOwnProperty('material')) {
+							so.material.color.set(SELECTED.color[selectIndex])
+							if (so.material.hasOwnProperty('ambient')) {
+								so.material.ambient.set(SELECTED.color[selectIndex])
+							}
+						}
+					else if (so.hasOwnProperty('children')) {
+						so.children.forEach ( function(selectobjectchild) {
+							if (selectobjectchild.hasOwnProperty('material')) {
+								// console.log(SELECTED.color[selectIndex]);
+								selectobjectchild.material.color.set( SELECTED.color[selectIndex] )
+								if (selectobjectchild.material.hasOwnProperty('ambient')) {
+									selectobjectchild.material.ambient.set(SELECTED.color[selectIndex])
+								}
+							}
+						})
+					}
+				});
+				SELECTED.sceneobject = [];
+				SELECTED.color = [];
+				SELECT = false;
+				LASTHIGHLIGHTED = "";
+				$( "#attributesholder" ).empty();
+			}
+		}
+function isFunction(func){
+    if(typeof func == 'function') return true;
 }
 
 //			var insideMarquee = false;

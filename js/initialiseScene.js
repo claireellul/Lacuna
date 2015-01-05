@@ -51,42 +51,32 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	//camera =  new THREE.OrthographicCamera( canvasWidth / - 2, canvasWidth / 2, canvasHeight / 2, canvasHeight / - 2, 1, 1000 );
-	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
+	//camera =  new THREE.OrthographicCamera( canvasWidth / - 16, canvasWidth / 16, canvasHeight / 16, canvasHeight / - 16, -200, 10000 );
+	camera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.01, 10000 );
+
 	raycamera = new THREE.PerspectiveCamera( 75, canvasWidth/canvasHeight, 0.1, 10000 );
-	//renderer = new THREE.WebGLRenderer({ antialias: true });
-					renderer = new THREE.CanvasRenderer();
+	renderer = new THREE.WebGLRenderer({ antialias: true });
+	//renderer = new THREE.CanvasRenderer();
 
 	renderer.setSize( canvasWidth, canvasHeight );
 	container.appendChild( renderer.domElement );
+	controlsTarget = new THREE.Vector3(CENTROID[0]+5,CENTROID[1],0);
+	controlsMode == "TRACKBALL"
+	setupControls("TRACKBALL");
+	interactionMode = "ZOOM";
 
-	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-	var cube = new THREE.Mesh( geometry, material );
-	scene.add( cube );
-
-	controls = new THREE.TrackballControls( camera, renderer.domElement );
-	controls.enabled = true;
-	controls.rotateSpeed = 0.6;
-	controls.zoomSpeed = 1.0;
-	controls.panSpeed = 1.0;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.minDistance = 50;
-	controls.maxDistance = 8000;
-	controls.keys = [ 65, 83, 68 ];
-	//controls.target = new THREE.Vector3(CENTROID[0], CENTROID[1], 0)
-	controls.addEventListener( 'change', render );
-
-
-
-				//camera.position.set(centroid0-300, centroid1, 500 );
-
+	// rotate teh camera to GIS coordinates
+	//camera.up = new THREE.Vector3(-1,-1,-1);
+	//camera.up.set( 0, 0, 1 );
 	camera.position.x = CENTROID[0];
-	camera.position.y = CENTROID[1];
+	camera.position.y = CENTROID[1]-100;
 	camera.position.z = 50;
+
+	//camera.position.x = CENTROID[0];
+	//camera.position.y = CENTROID[1];
+	//camera.position.z = 500;
+
+	//camera.lookAt(CENTROID[0],CENTROID[1],500);
 
 	raycamera.position.x = CENTROID[0];
 	raycamera.position.y = CENTROID[1];
@@ -99,23 +89,28 @@ function init() {
 	// green is y
 
 
-				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
-					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
-					object.position.x =  CENTROID[0]-100;
-					object.position.y =  CENTROID[1];
-					object.position.z = 0;
+	var geometry = new THREE.BoxGeometry( 40, 40, 40 );
+		var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+		object.position.x =  CENTROID[0];
+		object.position.y =  CENTROID[1];
+		object.position.z = 100;
 
-				//	object.scale.x =  200 + 1;
-				//	object.scale.y = 200 + 1;
-				//	object.scale.z = 50 + 1;
-
-
-					scene.add( object );
-					sceneobjects.push( object );
+		scene.add( object );
+		sceneobjects.push( object );
 
 
+	var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+		var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
+		object.position.x =  CENTROID[0];
+		object.position.y =  CENTROID[1];
+		object.position.z = 0;
 
-	axes = new THREE.AxisHelper(400);
+		scene.add( object );
+		sceneobjects.push( object );
+
+
+
+	axes = new THREE.AxisHelper(200);
 	// NB:  THIS DOESN'T WORK  axes.position = new THREE.Vector3D (X,y,z);
 	axes.position.x = CENTROID[0];
 	axes.position.y = CENTROID[1];
@@ -132,7 +127,6 @@ function init() {
 	animate();
 	addedToScene = []
 	visibleBools = []
-
 	addLayers();
 
 }
