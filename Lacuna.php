@@ -15,8 +15,6 @@
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/FlyControls.js"></script>
 		<script src="js/FirstPersonControls.js"></script>
-		<script src="js/Projector.js"></script>
-		<script src="js/CanvasRenderer.js"></script>
 		<script src="js/stats.min.js"></script>
 		<script src="js/jquery-1.11.0.min.js"></script> <!-- jQuery must be defined first! -->
 		<script src="js/jquery-ui.js"></script>
@@ -94,7 +92,7 @@
 					<div id="layerscontainer">
 						<div id="layers">
 							<p class="titles">Layers</p>
-							<script> var projectName = "<?php echo($_GET['projectName'])?>";console.log("Project Name" +projectName); </script>
+							<script> var projectName = "<?php echo($_GET['projectName'])?>";console.log("Project Name" +projectName); console.log("SELECT tablename,* FROM projectMetadata  WHERE projectName = '"+projectName+"' ORDER BY tableName ASC");</script>
 							<?php
 								$projectName=$_GET['projectName'];
 
@@ -103,7 +101,9 @@
 
 									// claire ellul - get only the layers for a specific project
 									if ($projectName) {
+
 										$result =pg_query($db, "SELECT tablename,* FROM projectMetadata  WHERE projectName = '".$projectName."' ORDER BY tableName ASC");
+
 									}
 									else {
 										$result =pg_query($db, "SELECT tablename,* FROM projectMetadata   ORDER BY tableName ASC");
