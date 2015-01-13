@@ -10,10 +10,11 @@
 	//$result = pg_query($db, "SELECT table_name FROM information_schema.tables  WHERE table_schema = 'public'");
 
 	// claire ellul - change so that we can work with multiple projects
-	$result= pg_query($db,"SELECT tableName FROM projectMetadata  WHERE projectName = '$projectName' ORDER BY tableName ASC");
+	$result= pg_query($db,"SELECT tableName,geometrycolumnname FROM projectMetadata  WHERE projectName = '$projectName' ORDER BY tableName ASC");
 	while ($layer = pg_fetch_row($result)) {
 			$thegeom = '"' . $layer[0] . '"';
-			$extentquery = "SELECT ST_XMax(ST_Extent(geom)), ST_YMax(ST_Extent(geom)), ST_XMin(ST_Extent(geom)), ST_YMin(ST_Extent(geom)) FROM $thegeom ;";
+			$geomColumn = $layer[1];
+			$extentquery = "SELECT ST_XMax(ST_Extent($geomColumn)), ST_YMax(ST_Extent($geomColumn)), ST_XMin(ST_Extent($geomColumn)), ST_YMin(ST_Extent($geomColumn)) FROM $thegeom ;";
 			# echo $extentquery;
 			$extent = pg_query($db, $extentquery);
 			while ($geoms = pg_fetch_row($extent)) {
